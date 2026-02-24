@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CMS Card Management System</title>
+<title>NID Correction Portal — Official</title>
 <style>
 :root{--blue:#0b63b6;--muted:#6b7b8f;--card-bg:#fff}
 *{box-sizing:border-box}
@@ -40,6 +40,8 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
 .back-btn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer}
 .footer-note{font-size:13px;color:var(--muted);margin-top:10px}
 @media(max-width:900px){.detail-card{margin:10px}}
+
+.hidden{display:none}
 
 /* ── NEW AUTH STYLES ──────────────────────────────────────────────── */
 .auth-wrapper {
@@ -167,6 +169,105 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
 @media (max-width: 640px) {
   .auth-box { max-width: 94%; }
 }
+
+/* ===== Mobile / overflow fixes (structure won't break) ===== */
+* { box-sizing: border-box; }
+body { overflow-x: hidden; }
+
+/* Make main wrappers truly responsive */
+.container, .wrapper, .page, .main, .card, .panel {
+  max-width: 100%;
+}
+
+/* Table container scroll on small screens */
+.table-wrap, .table-responsive, .results-table, .table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* If the results table is a <table> without wrapper, ensure its parent can scroll */
+#resultsWrap { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Keep table inside border, prevent text from spilling out */
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th, td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Slightly smaller text & padding on mobile so border stays aligned */
+@media (max-width: 520px) {
+  .topbar, .header, .nav { padding-left: 12px !important; padding-right: 12px !important; }
+  th, td { padding: 10px 8px !important; font-size: 12px !important; }
+  .card, .panel { border-radius: 10px !important; }
+}
+
+/* Prevent any child from exceeding viewport width */
+img, svg, canvas, video, iframe, input, select, button { max-width: 100%; }
+
+
+/* ===== v5: Full-width mobile layout fixes ===== */
+html, body { width: 100%; max-width: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+
+/* Common wrapper ids/classes in this file */
+#mainContainer, #appArea, #resultsWrap, #dashboard, #content, #page, #wrapper, .wrapper, .container, .main-container, .content-area {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+/* Make cards/panels stretch to full width on mobile */
+.card, .panel, .box, .section, .table-card, .results-card {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* If table has a min-width that causes blank area, remove it */
+table, .results-table { min-width: 0 !important; }
+
+/* Table should not force huge gaps; allow horizontal scroll within wrap when needed */
+#resultsWrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+#resultsWrap table { width: 100% !important; table-layout: auto !important; }
+
+/* Checkbox must be clickable */
+input[type="checkbox"] { pointer-events: auto !important; opacity: 1 !important; }
+input[type="checkbox"][disabled] { opacity: .6 !important; }
+
+/* Prevent any element from pushing layout beyond screen */
+* { max-width: 100%; }
+
+
+@media (max-width: 680px){
+  .header-row, .top-row, .topbar, .mainHeader, #mainHeader, .header, .nav {
+    flex-wrap: wrap !important;
+  }
+  .header-row > *, .top-row > *, .topbar > * {
+    width: 100% !important;
+  }
+}
+
+
+/* ===== v6: Table text normal (no vertical letters) ===== */
+#resultsWrap table { table-layout: auto !important; }
+#resultsWrap th, #resultsWrap td {
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: manual !important;
+}
+#resultsWrap th {
+  white-space: nowrap !important;
+}
+/* Keep most columns in one line; allow Applicant Name to wrap normally */
+#resultsWrap td:not(:nth-child(3)) { white-space: nowrap !important; }
+#resultsWrap td:nth-child(3) { white-space: normal !important; }
+
 </style>
 </head>
 <body>
@@ -190,6 +291,14 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
           <input type="password" id="userPass" placeholder="পাসওয়ার্ড" autocomplete="off">
           <span class="toggle-eye" onclick="togglePass()">👁</span>
         </div>
+
+        <div class="input-group">
+          <select id="userRole" style="width:100%; padding:13px 16px; border:1px solid #d0e0f5; border-radius:8px; font-size:15px; background:#fff;">
+            <option value="OFFICER">Officer</option>
+            <option value="OPERATOR">Operator</option>
+            <option value="DG">DG</option>
+          </select>
+        </div>
         <button class="auth-btn" id="loginBtn">লগইন করুন</button>
       </div>
 
@@ -199,7 +308,7 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
           <small>আপনার মোবাইলে পাঠানো ৬ সংখ্যার কোডটি প্রবেশ করান</small>
         </div>
         <div class="input-group">
-          <input type="number" id="otpInput" placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code">
+          <input type="text" id="otpInput" placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
         </div>
         <button class="auth-btn" id="verifyOtpBtn">যাচাই করুন</button>
       </div>
@@ -258,8 +367,7 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
-      <div class="footer-note">Login বাদ দেওয়া হয়েছে — সরাসরি সার্চ ব্যবহার করুন।</div>
-    </div>
+      </div>
   </div>
 </div>
 
@@ -307,31 +415,33 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
 const BASE_CURRENT = { নাম: 'আতিকুর রহমান', name: 'Atikur Rahman', birthday: '04-03-1988'};
 const CATEGORY_LIST = ['Ga'];
 
-/* ===== Defaults ===== */
-sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Ga');
-sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '3');
+/* ===== Defaults (NO local storage (disabled)/session storage (disabled)) ===== */
+let ec_selected_category = 'Ga';
+let ec_app_count = 3;
+let ec_last_nid = null;
+
+// In-memory state store: { nid: { current, requests } }
+const MEMORY_DB = Object.create(null);
 
 function storageKey(n) { return 'ec_nid_' + n }
-function saveState(n, o) { 
-  // Deep copy to prevent reference issues
-  localStorage.setItem(storageKey(n), JSON.stringify(o)); 
+function saveState(n, o) {
+  // NO local storage (disabled): keep in memory only
+  MEMORY_DB[n] = JSON.parse(JSON.stringify(o));
 }
-function loadState(n) { 
-  const v = localStorage.getItem(storageKey(n)); 
-  return v ? JSON.parse(v) : null; 
+
+function loadState(n) {
+  // NO local storage (disabled): read from memory only
+  const v = MEMORY_DB[n];
+  return v ? JSON.parse(JSON.stringify(v)) : null;
 }
+
 function el(id) { return document.getElementById(id) }
 function uuid() { return 'APP' + Math.random().toString(36).slice(2, 9).toUpperCase() }
 
-/* ===== Logo load ===== */
-window.addEventListener('load', () => {
-  const l = localStorage.getItem('ec_logo');
-  if (l && el('topLogo')) {
-    el('topLogo').src = l;
-    el('topLogo').style.display = 'block';
-  }
-});
-
+/* ===== Logo load =====
+   Disabled: NO local storage (disabled) in this build.
+   If you want a logo, set <img id="topLogo" src="..."> directly in HTML.
+*/
 /* ===== Search Events ===== */
 el('searchBtn').onclick = doSearch;
 el('nidInput').onkeydown = e => { if (e.key === 'Enter') doSearch() };
@@ -348,48 +458,62 @@ function doSearch() {
     return;
   }
 
-  el('searchBtn').disabled = true;
-  const prev = el('searchBtn').textContent;
-  el('searchBtn').innerHTML = '<span class="spinner"></span>';
+  const btn = el('searchBtn');
+  btn.disabled = true;
+  const prevText = btn.textContent;
+  btn.innerHTML = '<span class="spinner"></span>';
+
+  // failsafe (never stuck)
+  if (window.__searchFailsafe) clearTimeout(window.__searchFailsafe);
+  window.__searchFailsafe = setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }, 8000);
 
   setTimeout(() => {
-    el('searchBtn').disabled = false;
-    el('searchBtn').textContent = prev;
+    try {
+      let st = loadState(nid);
+      const selCat = ec_selected_category || 'Ga';
+      const count = 1;
 
-    let st = loadState(nid);
-    const selCat = sessionStorage.getItem('ec_selected_category') || 'Ga';
-    const count = parseInt(sessionStorage.getItem('ec_app_count')) || 3;
+      if (!st) {
+        const current = JSON.parse(JSON.stringify(BASE_CURRENT));
+        current.nid = nid;
 
-    if (!st) {
-      const current = JSON.parse(JSON.stringify(BASE_CURRENT));
-      current.nid = nid;
-      const requests = [];
-      const startIdx = CATEGORY_LIST.indexOf(selCat);
-
-      for (let i = 0; i < count; i++) {
-        const cat = CATEGORY_LIST[(startIdx + i) % 4];
-        const status = i < count - 1 ? 'Rejected' : 'Pending';
-        const newValues = { নাম: 'মোঃ আনিসুর রহমান, name: 'MD ANISUR RAHMAN, birthday: '05-03-1990' };
-        const oldValues = JSON.parse(JSON.stringify(current));  // deep copy
-
-        requests.push({
-          id: uuid(),
-          category: cat,
-          status,
-          oldValues,
-          newValues,
-          notes: 'সংশোধনের অনুরোধ',
-          previousApplied: null
-        });
+        const requests = [];
+        const startIdx = Math.max(0, CATEGORY_LIST.indexOf(selCat));
+        for (let i = 0; i < count; i++) {
+          const cat = CATEGORY_LIST[(startIdx + i) % CATEGORY_LIST.length];
+          const status = i < count - 1 ? 'Rejected' : 'Pending';
+          const newValues = { নাম: 'মোঃ আনিসুর রহমান', name: 'MD ANISUR RAHMAN', birthday: '05-03-1990' };
+          const oldValues = JSON.parse(JSON.stringify(current));
+          requests.push({
+            id: uuid(),
+            category: cat,
+            status,
+            oldValues,
+            newValues,
+            notes: 'সংশোধনের অনুরোধ',
+            previousApplied: null
+          });
+        }
+        st = { current, requests };
+        saveState(nid, st);
       }
 
-      st = { current, requests };
-      saveState(nid, st);
+      ec_last_nid = nid;
+      renderResults(nid, st);
+      el('resultsWrap').style.display = 'block';
+    } catch (e) {
+      console.error(e);
+      msg.textContent = 'Search error. Please try again.';
+      msg.style.display = 'block';
+    } finally {
+      clearTimeout(window.__searchFailsafe);
+      window.__searchFailsafe = null;
+      btn.disabled = false;
+      btn.textContent = prevText;
     }
-
-    sessionStorage.setItem('ec_last_nid', nid);
-    renderResults(nid, st);
-    el('resultsWrap').style.display = 'block';
   }, 700);
 }
 
@@ -421,7 +545,7 @@ function renderResults(nid, state) {
   document.querySelectorAll('.eye').forEach(e => {
     e.onclick = () => {
       const idx = parseInt(e.getAttribute('data-idx'));
-      const n = sessionStorage.getItem('ec_last_nid');
+      const n = ec_last_nid;
       const s = loadState(n);
       if (s) openDetailPage(n, idx, s);
     };
@@ -438,8 +562,8 @@ function openDetailPage(nid, idx, state) {
   el('detailMeta').textContent = `ID: ${req.id} | Category: ${req.category}`;
 
   const fields = [
-    { label: 'নাম (বাংলা), key: 'name' },
-    {label: 'Name (ইংরেজি)', key: 'name' },
+    { label: 'নাম (বাংলা)', key: 'নাম' },
+    { label: 'Name (ইংরেজি)', key: 'name' },
     { label: 'জন্ম তারিখ', key: 'birthday' },
   ];
 
@@ -493,35 +617,93 @@ function openDetailPage(nid, idx, state) {
   }
 
   approveBtn.onclick = () => {
+    // Clear timers so messages don't overlap
+    if (window.__approveAutoRollbackTimer) clearTimeout(window.__approveAutoRollbackTimer);
+    
+    // UI start
+    loader.style.display = 'inline-block';
     approveBtn.disabled = true;
     cancelBtn.disabled = true;
-    loader.style.display = 'inline-block';
+    rollbackBtn.disabled = true;
+    msg.style.display = 'none';
 
-    setTimeout(() => {
+    // Immediate success text (as you want)
+    msg.style.display = 'block';
+    msg.className = 'msg-success';
+    msg.textContent = 'অনুমোদন সফল হয়েছে।';
+
+    // Safety: never keep loader spinning forever
+    if (window.__approveLoaderFailsafe) clearTimeout(window.__approveLoaderFailsafe);
+    window.__approveLoaderFailsafe = setTimeout(() => {
       loader.style.display = 'none';
+      approveBtn.disabled = false;
+      cancelBtn.disabled = false;
+    }, 2500);
 
-      // Save previous state for rollback
-      req.previousApplied = JSON.parse(JSON.stringify(state.current));
+    // Apply + render quickly
+    setTimeout(() => {
+      try {
+        const prevApplied = JSON.parse(JSON.stringify(state.current));
+        const req = state.requests[idx];
 
-      // Apply changes ONLY to current record
-      state.current = { ...state.current, ...req.newValues };
+        // Apply new values into current (only matching keys)
+        Object.keys(req.newValues || {}).forEach(k => {
+          if (k in state.current) state.current[k] = req.newValues[k];
+        });
 
-      // Update ONLY this request's status
-      state.requests[idx].status = 'Approved by ' + req.category;
+        req.status = 'Approved';
+        req.previousApplied = prevApplied;
 
-      saveState(nid, state);
+        saveState(nid, state);
 
-      msg.style.display = 'block';
-      msg.className = 'msg-success';
-      msg.textContent = 'অনুমোদন সফল হয়েছে।';
+        // Buttons
+        approveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        rollbackBtn.style.display = 'inline-block';
+        rollbackBtn.disabled = false;
 
-      approveBtn.style.display = 'none';
-      cancelBtn.style.display = 'none';
-      rollbackBtn.style.display = 'inline-block';
+        renderResults(nid, state);
+      } catch (e) {
+        console.error(e);
+        msg.style.display = 'block';
+        msg.className = 'msg-info';
+        msg.textContent = 'সিস্টেম এরর হয়েছে, আবার চেষ্টা করুন।';
+        approveBtn.disabled = false;
+        cancelBtn.disabled = false;
+      } finally {
+        loader.style.display = 'none';
+        if (window.__approveLoaderFailsafe) {
+          clearTimeout(window.__approveLoaderFailsafe);
+          window.__approveLoaderFailsafe = null;
+        }
+      }
+    }, 400);
 
-      // Re-render with updated state
-      renderResults(nid, state);
-    }, 1200);
+    // 15 seconds পরে অটোমেটিক rollback হবে
+    window.__approveAutoRollbackTimer = setTimeout(() => {
+      const st = loadState(nid);
+      if (!st || !st.requests || !st.requests[idx]) return;
+
+      const r = st.requests[idx];
+      if (r.previousApplied) {
+        st.current = JSON.parse(JSON.stringify(r.previousApplied));
+        r.previousApplied = null;
+      }
+      r.status = 'Pending';
+      saveState(nid, st);
+
+      try { renderResults(nid, st); } catch (e) { console.error(e); }
+
+      // 10 seconds AFTER rollback: show DG notice message
+      if (window.__rollbackDGMsgTimer) clearTimeout(window.__rollbackDGMsgTimer);
+      window.__rollbackDGMsgTimer = setTimeout(() => {
+        msg.style.display = 'block';
+        msg.className = 'msg-info';
+        msg.textContent = 'এটি জন্ম তারিখ সংশোধন শুধু মাত্র DG মহোদয় করতে পারবেন।';
+        window.__rollbackDGMsgTimer = null;
+      }, 10000);
+      window.__approveAutoRollbackTimer = null;
+    }, 15000);
   };
 
   cancelBtn.onclick = () => {
@@ -532,6 +714,7 @@ function openDetailPage(nid, idx, state) {
     loader.style.display = 'inline-block';
 
     setTimeout(() => {
+    CURRENT_ROLE = role;
       loader.style.display = 'none';
 
       // Update ONLY this request
@@ -555,6 +738,13 @@ function openDetailPage(nid, idx, state) {
   rollbackBtn.onclick = () => {
     loader.style.display = 'inline-block';
 
+    // Clear previous timer (if user clicks again)
+    if (window.__rollbackMsgTimer) {
+      clearTimeout(window.__rollbackMsgTimer);
+      window.__rollbackMsgTimer = null;
+    }
+
+    // Do the rollback processing (fast), but show the DG notice message AFTER 6 seconds
     setTimeout(() => {
       loader.style.display = 'none';
 
@@ -568,22 +758,36 @@ function openDetailPage(nid, idx, state) {
 
       saveState(nid, state);
 
-      msg.style.display = 'block';
-      msg.className = 'msg-info';
-      msg.textContent = 'Reverted to Pending.';
-
+      // Buttons
       approveBtn.style.display = 'inline-block';
       cancelBtn.style.display = 'inline-block';
       rollbackBtn.style.display = 'none';
 
       renderResults(nid, state);
+
+      // 10 seconds AFTER rollback: show DG notice message
+      if (window.__rollbackDGMsgTimer) clearTimeout(window.__rollbackDGMsgTimer);
+      window.__rollbackDGMsgTimer = setTimeout(() => {
+        msg.style.display = 'block';
+        msg.className = 'msg-info';
+        msg.textContent = 'এটি জন্ম তারিখ সংশোধন শুধু মাত্র DG মহোদয় করতে পারবেন।';
+        window.__rollbackDGMsgTimer = null;
+      }, 10000);
     }, 900);
+
+    // Show message after 6 seconds (5/7 sec requirement; here = 6 sec)
+    window.__rollbackMsgTimer = setTimeout(() => {
+      msg.style.display = 'block';
+      msg.className = 'msg-info';
+      msg.textContent = 'এটি জন্ম তারিখ সংশোধন শুধু মাত্র DG মহোদয় করতে পারবেন।';
+      window.__rollbackMsgTimer = null;
+    }, 6000);
   };
 
   el('backToMain').onclick = () => {
     el('detailPage').style.display = 'none';
     el('appArea').style.display = 'block';
-    const n = sessionStorage.getItem('ec_last_nid');
+    const n = ec_last_nid;
     if (n) {
       const s = loadState(n);
       if (s) renderResults(n, s);
@@ -593,6 +797,7 @@ function openDetailPage(nid, idx, state) {
 
 // Login flow remains the same...
 const FIXED_OTP = "707390";
+let CURRENT_ROLE = 'OFFICER';
 
 function togglePass() {
   const p = el('userPass');
@@ -602,6 +807,7 @@ function togglePass() {
 el("loginBtn").onclick = function() {
   const uid = el("userId").value.trim();
   const pass = el("userPass").value.trim();
+  const role = (el("userRole") && el("userRole").value) ? el("userRole").value : 'OFFICER';
 
   if (!uid || !pass) {
     alert("ইউজার আইডি ও পাসওয়ার্ড দিন");
@@ -612,6 +818,7 @@ el("loginBtn").onclick = function() {
   this.classList.add("loading");
 
   setTimeout(() => {
+    CURRENT_ROLE = role;
     el("loginSection").style.display = "none";
     el("otpSection").style.display = "block";
     this.textContent = "লগইন করুন";
@@ -630,6 +837,14 @@ el("verifyOtpBtn").onclick = function() {
   el("authWrapper").style.display = "none";
   el("mainHeader").style.display = "flex";
   el("mainContainer").style.display = "block";
+
+  // show user info
+  const uid = el("userId").value.trim() || 'User';
+  if (el('loggedUser')) {
+    el('loggedUser').textContent = `Logged in: ${uid} (${CURRENT_ROLE})`;
+    el('loggedUser').style.display = 'block';
+  }
+  if (el('logoutBtn')) el('logoutBtn').style.display = 'inline-block';
 };
 
 function logout() { location.reload(); }
