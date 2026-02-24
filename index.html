@@ -1,347 +1,640 @@
-<!DOCTYPE html>
-<html lang="bn">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMS - NID DATABASE পার্টনার পোর্টাল</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f9; min-height: 100vh; }
-    .header { background: #0b5ed7; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-    .logo { width: 50px; margin-right: 10px; }
-    .container { display: flex; flex-direction: row; min-height: calc(100vh - 60px); }
-    .sidebar { width: 220px; background: #fff; border-right: 1px solid #ddd; }
-    .sidebar ul { list-style: none; }
-    .sidebar ul li a { display: block; padding: 12px; text-decoration: none; color: #000; cursor: pointer; }
-    .sidebar ul li a:hover { background: #f0f0f0; }
-    .content { flex: 1; padding: 20px; }
-    .box { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-    .form-control { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-    .btn { padding: 10px 20px; background: #0b5ed7; border: none; color: white; cursor: pointer; border-radius: 5px; font-size: 16px; }
-    .btn:hover { background: #0949a5; }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CMS Card Management System</title>
+<style>
+:root{--blue:#0b63b6;--muted:#6b7b8f;--card-bg:#fff}
+*{box-sizing:border-box}
+body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans',Arial;background:#f4f8ff;margin:0;color:#0b2447}
+header{background:var(--blue);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+header .brand{font-weight:700;font-size:18px}
+.container{max-width:1120px;margin:20px auto;padding:0 16px}
+.card{background:var(--card-bg);border-radius:10px;box-shadow:0 8px 30px rgba(11,38,71,0.06);overflow:hidden}
+.muted{color:var(--muted);font-size:13px}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--blue);color:#fff;border-radius:8px 8px 0 0}
+.panel{background:#fff;padding:18px;border-radius:0 0 8px 8px}
+.search-row{display:flex;gap:10px;margin-bottom:10px}
+.search-row input{flex:1}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+thead th{background:#f2f8ff;color:#0b3a6e;text-align:left;padding:12px;border-bottom:1px solid #e9f3ff}
+tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
+.status-chip{padding:6px 10px;border-radius:14px;border:1px solid #e6f0ff;font-weight:600;font-size:13px}
+.status-pending{background:#fff8e6;border-color:#ffe8a8;color:#8a6b00}
+.status-rejected{background:#fff2f2;border-color:#f5c6cb;color:#8a1f1f}
+.status-approved{background:#f2fff6;border-color:#b7e8c7;color:#216e2b}
+.eye{cursor:pointer;font-size:18px;color:var(--blue)}
+.center{text-align:center}
 
-    /* লগইন + OTP */
-    #loginContainer, #otpContainer { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    #loginForm, #otpForm, #registerForm { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.15); width: 100%; max-width: 400px; text-align: center; }
-    #message, #otpMessage, #regMessage { margin-top: 15px; font-weight: bold; }
-    .success { color: green; }
-    .error { color: red; }
-    #dashboard { display: none; }
-    #loading { display: none; text-align: center; font-size: 18px; margin: 30px; color: #0b5ed7; }
-    .back-btn { margin-bottom: 15px; width: auto; }
+#detailPage{display:none;position:fixed;inset:0;background:#f4f6f9;z-index:9999;overflow:auto}
+.detail-header{background:var(--blue);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.detail-card{max-width:1060px;margin:18px auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 8px 24px rgba(11,38,71,0.06)}
+.detail-table{width:100%;border-collapse:collapse;margin-top:8px}
+.detail-table th,.detail-table td{border:1px solid #eef6ff;padding:10px}
+.spinner{width:28px;height:28px;border-radius:50%;border:4px solid #f1f5fb;border-top-color:var(--blue);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg-success{color:#0b7028;font-weight:700;margin-top:12px}
+.msg-info{color:#0b63b6;font-weight:700;margin-top:12px}
+.controls{display:flex;gap:10px;align-items:center}
+.back-btn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer}
+.footer-note{font-size:13px;color:var(--muted);margin-top:10px}
+@media(max-width:900px){.detail-card{margin:10px}}
 
-    /* Result + PDF viewer */
-    #resultArea { margin-top: 15px; display: none; }
-    #resultText { margin-bottom: 10px; line-height: 1.6; }
-    .viewer { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; height: 420px; background: #fff; }
-    .viewer iframe { width: 100%; height: 100%; border: 0; }
-    .btnrow { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+/* ── NEW AUTH STYLES ──────────────────────────────────────────────── */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0b63b6 0%, #0a3d73 100%);
+  padding: 20px;
+}
 
-    /* মোবাইল রেসপনসিভ */
-    @media (max-width: 768px) {
-      .container { flex-direction: column; }
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ddd; }
-      .header { font-size: 18px; padding: 12px; flex-direction: column; gap: 10px; }
-      .logo { width: 40px; }
-      .form-control, .btn { font-size: 16px; padding: 12px; }
-      #loginForm, #otpForm, #registerForm { padding: 25px 15px; max-width: 90%; }
-      .viewer { height: 360px; }
-    }
-  </style>
+.auth-box {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  overflow: hidden;
+}
+
+.auth-header {
+  background: var(--blue);
+  color: white;
+  padding: 28px 24px 20px;
+  text-align: center;
+}
+
+.auth-header h2 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 600;
+}
+
+.auth-header .subtitle {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  opacity: 0.9;
+}
+
+.auth-body {
+  padding: 28px 24px 32px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 13px 16px 13px 14px;
+  border: 1px solid #d0e0f5;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(11,99,182,0.15);
+}
+
+.input-group .toggle-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 1.1rem;
+  user-select: none;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-btn:hover {
+  background: #094e92;
+}
+
+.auth-btn.loading {
+  pointer-events: none;
+  background: #094e92;
+}
+
+.auth-footer {
+  text-align: center;
+  font-size: 0.81rem;
+  color: #8899aa;
+  padding: 0 24px 24px;
+}
+
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--blue);
+  color: white;
+}
+
+.btn.secondary {
+  background: #eef4ff;
+  color: var(--blue);
+  border: 1px solid #d6e4ff;
+}
+
+.btn.secondary:hover {
+  background: #dbe9ff;
+}
+
+@media (max-width: 640px) {
+  .auth-box { max-width: 94%; }
+}
+</style>
 </head>
 <body>
 
-  <!-- লগইন / রেজিস্টার -->
-  <div id="loginContainer">
-    <div>
-      <form id="loginForm">
-        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Election_Commission_Logo.svg" alt="লোগো">
-        <h3>CMS - NID DATABASE পার্টনার পোর্টাল</h3>
-        <input type="text" id="userid" class="form-control" placeholder="ইউজার আইডি" required>
-        <input type="password" id="password" class="form-control" placeholder="পাসওয়ার্ড" required>
-        <button type="submit" class="btn">লগইন</button>
-        <p style="margin-top:15px;">অ্যাকাউন্ট নেই? <a href="#" id="showRegister">রেজিস্টার করুন</a></p>
-        <div id="message"></div>
-      </form>
+<!-- ── NEW LOGIN / OTP ─────────────────────────────────────────────── -->
+<div class="auth-wrapper" id="authWrapper">
+  <div class="auth-box">
 
-      <!-- রেজিস্টার ফর্ম (হাইডেন) -->
-      <form id="registerForm" style="display:none;">
-        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Election_Commission_Logo.svg" alt="লোগো">
-        <h3>রেজিস্ট্রেশন</h3>
-        <input type="text" id="regUserid" class="form-control" placeholder="ইউজার আইডি" required>
-        <input type="password" id="regPassword" class="form-control" placeholder="পাসওয়ার্ড" required>
-        <button type="submit" class="btn">রেজিস্টার</button>
-        <p style="margin-top:15px;"><a href="#" id="showLogin">লগইন পেজে ফিরুন</a></p>
-        <div id="regMessage"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- OTP -->
-  <div id="otpContainer" style="display:none;">
-    <form id="otpForm">
-      <h3>OTP যাচাই</h3>
-      <input type="text" id="otp" class="form-control" placeholder="OTP দিন" maxlength="6" inputmode="numeric" autocomplete="one-time-code" required>
-      <button type="submit" class="btn">সাবমিট</button>
-      <div id="otpMessage"></div>
-    </form>
-  </div>
-
-  <div id="loading">যাচাই হচ্ছে... অনুগ্রহ করে অপেক্ষা করুন</div>
-
-  <!-- ড্যাশবোর্ড -->
-  <div id="dashboard">
-    <div class="header">
-      <div style="display: flex; align-items: center;">
-        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Election_Commission_Logo.svg" alt="লোগো">
-        <span>CMS - NID DATABASE পার্টনার পোর্টাল</span>
-      </div>
-      <button class="btn" onclick="logout()">লগআউট</button>
+    <div class="auth-header">
+      <h2>CMS Card Management System</h2>
+      <div class="subtitle">বাংলাদেশ নির্বাচন কমিশন<br>অনুমোদিত কর্মকর্তাদের জন্য</div>
     </div>
 
-    <div class="container">
-      <div class="sidebar">
-        <ul>
-          <li><a onclick="showForm('nid')">এনআইডি সার্চ</a></li>
-          <li><a onclick="showForm('mobile')">মোবাইল সার্চ</a></li>
-          <li><a onclick="showForm('birth')">জন্ম নিবন্ধন সার্চ</a></li>
-          <li><a onclick="showForm('formno')">ফর্ম নাম্বার</a></li>
-          <li><a onclick="showForm('correction')">সংশোধন অনুমোদন</a></li>
-        </ul>
-      </div>
-      <div class="content">
-        <div class="box" id="formArea">
-          <h3>একটি অপশন নির্বাচন করুন</h3>
+    <div class="auth-body">
+
+      <div id="loginSection">
+        <div class="input-group">
+          <input type="text" id="userId" placeholder="User ID / ইউজার আইডি" autocomplete="off">
         </div>
-
-        <!-- Result + PDF Viewer -->
-        <div class="box" id="resultArea">
-          <h3 style="margin-bottom:10px;">রেজাল্ট</h3>
-          <div id="resultText"></div>
-
-          <div class="viewer">
-            <iframe id="pdfViewer"></iframe>
-          </div>
-
-          <div class="btnrow">
-            <button class="btn" id="downloadBtn" style="display:none;">PDF ডাউনলোড</button>
-            <button class="btn" onclick="clearResult()">ক্লিয়ার</button>
-          </div>
+        <div class="input-group">
+          <input type="password" id="userPass" placeholder="পাসওয়ার্ড" autocomplete="off">
+          <span class="toggle-eye" onclick="togglePass()">👁</span>
         </div>
+        <button class="auth-btn" id="loginBtn">লগইন করুন</button>
+      </div>
 
+      <div id="otpSection" class="hidden" style="display:none">
+        <div style="text-align:center; margin-bottom:20px; color:#334155;">
+          <strong>OTP যাচাই</strong><br>
+          <small>আপনার মোবাইলে পাঠানো ৬ সংখ্যার কোডটি প্রবেশ করান</small>
+        </div>
+        <div class="input-group">
+          <input type="number" id="otpInput" placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code">
+        </div>
+        <button class="auth-btn" id="verifyOtpBtn">যাচাই করুন</button>
+      </div>
+
+    </div>
+
+    <div class="auth-footer">
+      Bangladesh Election Commission • CMS Protected • © 2026-2027 BEC
+    </div>
+
+  </div>
+</div>
+
+<header style="display:none" id="mainHeader">
+  <div class="brand">Bangladesh Election Commission</div>
+  <div class="muted">NID Correction Management</div>
+</header>
+
+<div class="container" style="display:none" id="mainContainer">
+  <!-- ✅ Login বাদ: সরাসরি App Area -->
+  <div id="appArea">
+    <div class="app-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img id="topLogo" src="" alt="" style="height:44px;display:none;border-radius:6px;padding:4px;background:#fff"/>
+        <div>
+          <div style="font-weight:700">NID Correction Portal</div>
+          <div style="font-size:13px" class="muted">Search and review correction requests</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div id="loggedUser" class="muted" style="display:none"></div>
+        <button class="btn" id="logoutBtn" style="display:none">Logout</button>
       </div>
     </div>
+
+    <div class="panel">
+      <div class="search-row">
+        <input id="nidInput" type="text" placeholder="Enter NID "/>
+        <button class="btn" id="searchBtn">Search</button>
+      </div>
+      <div id="searchMsg" style="display:none;color:#c0392b;margin-bottom:8px"></div>
+      <div id="resultsWrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px"></th>
+              <th>ID</th>
+              <th>Applicant Name</th>
+              <th>NID</th>
+              <th>Status</th>
+              <th>Category</th>
+              <th>Source</th>
+              <th style="width:80px">Action</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-note">Login বাদ দেওয়া হয়েছে — সরাসরি সার্চ ব্যবহার করুন।</div>
+    </div>
   </div>
+</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    const { jsPDF } = window.jspdf;
+<!-- ✅ DETAIL PAGE (Approve/Cancel/Rollback সব আছে) -->
+<div id="detailPage" style="display:none">
+  <div class="detail-header">
+    <button class="back-btn" id="backToMain">← Back</button>
+    <div style="font-weight:700">Applied Change</div>
+  </div>
+  <div class="detail-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:16px;font-weight:700;color:#0b3a6e" id="detailTitle">Application Details</div>
+      <div class="muted" id="detailMeta">ID: - | Category: -</div>
+    </div>
 
-    // OTP লিস্ট (আপনার আগের মতোই রাখা হলো)
-    const validOTPs = ["400087", "116643", "698908", "226350"];
+    <table class="detail-table">
+      <thead>
+        <tr style="background:#f7fbff;color:#0b3a6e">
+          <th style="width:48px;text-align:center"></th>
+          <th>Field</th>
+          <th>Old Value</th>
+          <th>New Value</th>
+        </tr>
+      </thead>
+      <tbody id="detailRows"></tbody>
+    </table>
 
-    // রেজিস্ট্রেশন / লগইন টগল
-    document.getElementById("showRegister").addEventListener("click", e => {
-      e.preventDefault();
-      document.getElementById("loginForm").style.display = "none";
-      document.getElementById("registerForm").style.display = "block";
-    });
-    document.getElementById("showLogin").addEventListener("click", e => {
-      e.preventDefault();
-      document.getElementById("registerForm").style.display = "none";
-      document.getElementById("loginForm").style.display = "block";
-    });
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+      <div id="detailNote" class="muted">Notes: none</div>
+      <div class="controls">
+        <div id="detailLoader" style="display:none">
+          <span class="spinner"></span><span style="margin-left:8px" class="muted">Processing...</span>
+        </div>
+        <button id="approveBtn" class="btn">Approve</button>
+        <button id="cancelBtn" class="btn secondary">Cancel</button>
+        <button id="rollbackBtn" class="btn secondary" style="display:none">Rollback</button>
+      </div>
+    </div>
+    <div id="detailMsg" style="display:none;margin-top:12px"></div>
+  </div>
+</div>
 
-    // রেজিস্টার
-    document.getElementById("registerForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const user = document.getElementById("regUserid").value.trim();
-      const pass = document.getElementById("regPassword").value.trim();
-      const regMsg = document.getElementById("regMessage");
+<script>
+/* ===== Original Data ===== */
+const BASE_CURRENT = { নাম: 'আতিকুর রহমান', name: 'Atikur Rahman', birthday: '04-03-1988'};
+const CATEGORY_LIST = ['Ga'];
 
-      if (!user || !pass) {
-        regMsg.textContent = "সব ফিল্ড পূরণ করুন।"; regMsg.className = "error"; return;
+/* ===== Defaults ===== */
+sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Ga');
+sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '3');
+
+function storageKey(n) { return 'ec_nid_' + n }
+function saveState(n, o) { 
+  // Deep copy to prevent reference issues
+  localStorage.setItem(storageKey(n), JSON.stringify(o)); 
+}
+function loadState(n) { 
+  const v = localStorage.getItem(storageKey(n)); 
+  return v ? JSON.parse(v) : null; 
+}
+function el(id) { return document.getElementById(id) }
+function uuid() { return 'APP' + Math.random().toString(36).slice(2, 9).toUpperCase() }
+
+/* ===== Logo load ===== */
+window.addEventListener('load', () => {
+  const l = localStorage.getItem('ec_logo');
+  if (l && el('topLogo')) {
+    el('topLogo').src = l;
+    el('topLogo').style.display = 'block';
+  }
+});
+
+/* ===== Search Events ===== */
+el('searchBtn').onclick = doSearch;
+el('nidInput').onkeydown = e => { if (e.key === 'Enter') doSearch() };
+
+function doSearch() {
+  const nid = el('nidInput').value.trim();
+  const msg = el('searchMsg');
+  msg.style.display = 'none';
+  el('resultsWrap').style.display = 'none';
+
+  if (!nid || nid.length < 5) {
+    msg.textContent = 'Please enter a valid NID.';
+    msg.style.display = 'block';
+    return;
+  }
+
+  el('searchBtn').disabled = true;
+  const prev = el('searchBtn').textContent;
+  el('searchBtn').innerHTML = '<span class="spinner"></span>';
+
+  setTimeout(() => {
+    el('searchBtn').disabled = false;
+    el('searchBtn').textContent = prev;
+
+    let st = loadState(nid);
+    const selCat = sessionStorage.getItem('ec_selected_category') || 'Ga';
+    const count = parseInt(sessionStorage.getItem('ec_app_count')) || 3;
+
+    if (!st) {
+      const current = JSON.parse(JSON.stringify(BASE_CURRENT));
+      current.nid = nid;
+      const requests = [];
+      const startIdx = CATEGORY_LIST.indexOf(selCat);
+
+      for (let i = 0; i < count; i++) {
+        const cat = CATEGORY_LIST[(startIdx + i) % 4];
+        const status = i < count - 1 ? 'Rejected' : 'Pending';
+        const newValues = { নাম: 'মোঃ আনিসুর রহমান, name: 'MD ANISUR RAHMAN, birthday: '05-03-1990' };
+        const oldValues = JSON.parse(JSON.stringify(current));  // deep copy
+
+        requests.push({
+          id: uuid(),
+          category: cat,
+          status,
+          oldValues,
+          newValues,
+          notes: 'সংশোধনের অনুরোধ',
+          previousApplied: null
+        });
       }
 
-      const existing = localStorage.getItem("ecUser");
-      if (existing) {
-        regMsg.textContent = "শুধু একটি অ্যাকাউন্ট রেজিস্টার করা যাবে। লগইন করুন।"; regMsg.className = "error";
-        return;
-      }
-
-      localStorage.setItem("ecUser", JSON.stringify({ userid: user, password: pass }));
-      regMsg.textContent = "রেজিস্ট্রেশন সফল! এখন লগইন করুন।"; regMsg.className = "success";
-      setTimeout(() => {
-        document.getElementById("registerForm").style.display = "none";
-        document.getElementById("loginForm").style.display = "block";
-      }, 2000);
-    });
-
-    // লগইন
-    document.getElementById("loginForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const user = document.getElementById("userid").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      const message = document.getElementById("message");
-
-      const stored = JSON.parse(localStorage.getItem("ecUser"));
-      if (!stored || stored.userid !== user || stored.password !== pass) {
-        message.textContent = "ভুল ইউজার আইডি বা পাসওয়ার্ড!"; message.className = "error";
-        return;
-      }
-
-      message.textContent = "যাচাই হচ্ছে..."; message.className = "success";
-      document.getElementById("loading").style.display = "block";
-      setTimeout(() => {
-        document.getElementById("loginContainer").style.display = "none";
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("otpContainer").style.display = "flex";
-      }, 900);
-    });
-
-    // OTP
-    document.getElementById("otpForm").addEventListener("submit", e => {
-      e.preventDefault();
-      const otp = document.getElementById("otp").value.trim();
-      const msg = document.getElementById("otpMessage");
-
-      if (validOTPs.includes(otp)) {
-        msg.textContent = "সফল! স্বাগতম।"; msg.className = "success";
-        setTimeout(() => {
-          document.getElementById("otpContainer").style.display = "none";
-          document.getElementById("dashboard").style.display = "block";
-        }, 600);
-      } else {
-        msg.textContent = "ভুল OTP!"; msg.className = "error";
-      }
-    });
-
-    function logout() { location.reload(); }
-
-    // ===== Result + PDF Viewer (Blank PDF) =====
-    let lastPdfBlobUrl = null;
-
-    function clearResult() {
-      document.getElementById("resultArea").style.display = "none";
-      document.getElementById("resultText").innerHTML = "";
-      document.getElementById("pdfViewer").src = "";
-      document.getElementById("downloadBtn").style.display = "none";
-
-      if (lastPdfBlobUrl) {
-        URL.revokeObjectURL(lastPdfBlobUrl);
-        lastPdfBlobUrl = null;
-      }
+      st = { current, requests };
+      saveState(nid, st);
     }
 
-    function backToDefault() {
-      document.getElementById("formArea").innerHTML = "<h3>একটি অপশন নির্বাচন করুন</h3>";
-      clearResult();
-    }
+    sessionStorage.setItem('ec_last_nid', nid);
+    renderResults(nid, st);
+    el('resultsWrap').style.display = 'block';
+  }, 700);
+}
 
-    function showForm(type) {
-      clearResult();
+function renderResults(nid, state) {
+  const tbody = el('resultsBody');
+  tbody.innerHTML = '';
 
-      let title = "";
-      if (type === "nid") title = "এনআইডি সার্চ";
-      if (type === "mobile") title = "মোবাইল সার্চ";
-      if (type === "birth") title = "জন্ম নিবন্ধন সার্চ";
-      if (type === "formno") title = "ফর্ম নাম্বার";
-      if (type === "correction") title = "সংশোধন অনুমোদন";
+  state.requests.forEach((r, idx) => {
+    const tr = document.createElement('tr');
+    const nameDisplay = state.current.name;
+    const statusClass = r.status.includes('Approved')
+      ? 'status-approved'
+      : (r.status === 'Pending' ? 'status-pending' : 'status-rejected');
 
-      let html = `<button class="btn back-btn" onclick="backToDefault()">back</button><h3>${title}</h3>`;
+    tr.innerHTML = `
+      <td><input type="checkbox"/></td>
+      <td class="muted">${r.id}</td>
+      <td>${nameDisplay}</td>
+      <td>${nid}</td>
+      <td><span class="status-chip ${statusClass}">${r.status}</span></td>
+      <td>${r.category}</td>
+      <td class="muted">ONLINE</td>
+      <td class="center"><span class="eye" data-idx="${idx}" title="View details">👁</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-      if (type === "nid") {
-        html += `
-          <input type="text" id="nidInput" class="form-control" placeholder="এনআইডি নাম্বার">
-          <select id="nidType" class="form-control">
-            <option value="ServerCopy">সার্ভার কপি</option>
-            <option value="SignCopy">সাইন কপি</option>
-          </select>
-          <button class="btn" onclick="search('nid')">সার্চ</button>
-        `;
-      } else if (type === "mobile") {
-        html += `
-          <input type="text" id="mobileInput" class="form-control" placeholder="মোবাইল নাম্বার (যেমন: 01XXXXXXXXX)">
-          <button class="btn" onclick="search('mobile')">সার্চ</button>
-        `;
-      } else if (type === "birth") {
-        html += `
-          <input type="text" id="birthInput" class="form-control" placeholder="জন্ম নিবন্ধন নাম্বার">
-          <button class="btn" onclick="search('birth')">সার্চ</button>
-        `;
-      } else if (type === "formno") {
-        html += `
-          <input type="text" id="formnoInput" class="form-control" placeholder="ফর্ম নাম্বার">
-          <button class="btn" onclick="search('formno')">সার্চ</button>
-        `;
-      } else if (type === "correction") {
-        html += `
-          <input type="text" id="correctionInput" class="form-control" placeholder="সংশোধন রেফারেন্স/আইডি">
-          <button class="btn" onclick="search('correction')">সার্চ</button>
-        `;
+  // Re-attach eye click events
+  document.querySelectorAll('.eye').forEach(e => {
+    e.onclick = () => {
+      const idx = parseInt(e.getAttribute('data-idx'));
+      const n = sessionStorage.getItem('ec_last_nid');
+      const s = loadState(n);
+      if (s) openDetailPage(n, idx, s);
+    };
+  });
+}
+
+function openDetailPage(nid, idx, state) {
+  el('appArea').style.display = 'none';
+  el('detailPage').style.display = 'block';
+
+  const req = state.requests[idx];
+
+  el('detailTitle').textContent = 'Application Details';
+  el('detailMeta').textContent = `ID: ${req.id} | Category: ${req.category}`;
+
+  const fields = [
+    { label: 'নাম (বাংলা), key: 'name' },
+    {label: 'Name (ইংরেজি)', key: 'name' },
+    { label: 'জন্ম তারিখ', key: 'birthday' },
+  ];
+
+  const tbody = el('detailRows');
+  tbody.innerHTML = '';
+  fields.forEach((f, i) => {
+    const oldV = req.oldValues[f.key] || '-';
+    const newV = req.newValues[f.key] || '-';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center"><input type="checkbox" ${i < 4 ? 'checked' : ''}></td>
+      <td>${f.label}</td>
+      <td>${oldV}</td>
+      <td>${newV}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  el('detailNote').textContent = req.notes ? `Notes: ${req.notes}` : 'Notes: none';
+
+  const approveBtn = el('approveBtn');
+  const cancelBtn  = el('cancelBtn');
+  const rollbackBtn = el('rollbackBtn');
+  const loader = el('detailLoader');
+  const msg = el('detailMsg');
+
+  msg.style.display = 'none';
+  loader.style.display = 'none';
+  approveBtn.disabled = false;
+  cancelBtn.disabled = false;
+
+  // Reset visibility based on current status
+  if (req.status.includes('Approved')) {
+    approveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    rollbackBtn.style.display = 'inline-block';
+    msg.style.display = 'block';
+    msg.className = 'msg-success';
+    msg.textContent = 'Approval successful.';
+  } else if (req.status === 'Rejected') {
+    approveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    rollbackBtn.style.display = 'inline-block';
+    msg.style.display = 'block';
+    msg.className = 'msg-info';
+    msg.textContent = 'This application is rejected.';
+  } else {
+    approveBtn.style.display = 'inline-block';
+    cancelBtn.style.display = 'inline-block';
+    rollbackBtn.style.display = 'none';
+  }
+
+  approveBtn.onclick = () => {
+    approveBtn.disabled = true;
+    cancelBtn.disabled = true;
+    loader.style.display = 'inline-block';
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+
+      // Save previous state for rollback
+      req.previousApplied = JSON.parse(JSON.stringify(state.current));
+
+      // Apply changes ONLY to current record
+      state.current = { ...state.current, ...req.newValues };
+
+      // Update ONLY this request's status
+      state.requests[idx].status = 'Approved by ' + req.category;
+
+      saveState(nid, state);
+
+      msg.style.display = 'block';
+      msg.className = 'msg-success';
+      msg.textContent = 'অনুমোদন সফল হয়েছে।';
+
+      approveBtn.style.display = 'none';
+      cancelBtn.style.display = 'none';
+      rollbackBtn.style.display = 'inline-block';
+
+      // Re-render with updated state
+      renderResults(nid, state);
+    }, 1200);
+  };
+
+  cancelBtn.onclick = () => {
+    if (!confirm('Are you sure to reject this application?')) return;
+
+    approveBtn.disabled = true;
+    cancelBtn.disabled = true;
+    loader.style.display = 'inline-block';
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+
+      // Update ONLY this request
+      req.previousApplied = null;
+      state.requests[idx].status = 'Rejected';
+
+      saveState(nid, state);
+
+      msg.style.display = 'block';
+      msg.className = 'msg-info';
+      msg.textContent = 'Application rejected.';
+
+      approveBtn.style.display = 'none';
+      cancelBtn.style.display = 'none';
+      rollbackBtn.style.display = 'inline-block';
+
+      renderResults(nid, state);
+    }, 900);
+  };
+
+  rollbackBtn.onclick = () => {
+    loader.style.display = 'inline-block';
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+
+      if (req.previousApplied) {
+        state.current = JSON.parse(JSON.stringify(req.previousApplied));
+        req.previousApplied = null;
       }
 
-      document.getElementById("formArea").innerHTML = html;
+      // Revert ONLY this request's status
+      state.requests[idx].status = 'Pending';
+
+      saveState(nid, state);
+
+      msg.style.display = 'block';
+      msg.className = 'msg-info';
+      msg.textContent = 'Reverted to Pending.';
+
+      approveBtn.style.display = 'inline-block';
+      cancelBtn.style.display = 'inline-block';
+      rollbackBtn.style.display = 'none';
+
+      renderResults(nid, state);
+    }, 900);
+  };
+
+  el('backToMain').onclick = () => {
+    el('detailPage').style.display = 'none';
+    el('appArea').style.display = 'block';
+    const n = sessionStorage.getItem('ec_last_nid');
+    if (n) {
+      const s = loadState(n);
+      if (s) renderResults(n, s);
     }
+  };
+}
 
-    function search(type) {
-      let inputVal = "";
-      let filename = "";
+// Login flow remains the same...
+const FIXED_OTP = "707390";
 
-      if (type === "nid") {
-        inputVal = document.getElementById("nidInput").value.trim();
-        const nidType = document.getElementById("nidType").value; // ServerCopy / SignCopy
-        filename = `NID_${nidType}_${(inputVal || "UNKNOWN")}.pdf`;
-      } else if (type === "mobile") {
-        inputVal = document.getElementById("mobileInput").value.trim();
-        filename = `Mobile_${(inputVal || "UNKNOWN")}.pdf`;
-      } else if (type === "birth") {
-        inputVal = document.getElementById("birthInput").value.trim();
-        filename = `Birth_${(inputVal || "UNKNOWN")}.pdf`;
-      } else if (type === "formno") {
-        inputVal = document.getElementById("formnoInput").value.trim();
-        filename = `FormNo_${(inputVal || "UNKNOWN")}.pdf`;
-      } else if (type === "correction") {
-        inputVal = document.getElementById("correctionInput").value.trim();
-        filename = `Correction_${(inputVal || "UNKNOWN")}.pdf`;
-      } else {
-        inputVal = "N/A";
-        filename = `${type.toUpperCase()}_BLANK.pdf`;
-      }
+function togglePass() {
+  const p = el('userPass');
+  p.type = p.type === "password" ? "text" : "password";
+}
 
-      // আগের blob url থাকলে ক্লিন
-      if (lastPdfBlobUrl) {
-        URL.revokeObjectURL(lastPdfBlobUrl);
-        lastPdfBlobUrl = null;
-      }
+el("loginBtn").onclick = function() {
+  const uid = el("userId").value.trim();
+  const pass = el("userPass").value.trim();
 
-      // ✅ BLANK WHITE PDF (কোনো লেখা নেই)
-      const doc = new jsPDF();
-      // intentionally blank: no doc.text()
+  if (!uid || !pass) {
+    alert("ইউজার আইডি ও পাসওয়ার্ড দিন");
+    return;
+  }
 
-      const pdfBlob = doc.output("blob");
-      lastPdfBlobUrl = URL.createObjectURL(pdfBlob);
+  this.textContent = "যাচাই হচ্ছে...";
+  this.classList.add("loading");
 
-      // ✅ Result area show
-      document.getElementById("resultArea").style.display = "block";
-      document.getElementById("resultText").innerHTML =
-        `<b>অপশন:</b> ${type.toUpperCase()}<br><b>সার্চ ভ্যালু:</b> ${inputVal || "(ফাঁকা)"}`;
+  setTimeout(() => {
+    el("loginSection").style.display = "none";
+    el("otpSection").style.display = "block";
+    this.textContent = "লগইন করুন";
+    this.classList.remove("loading");
+  }, 1400);
+};
 
-      // ✅ Viewer-এ শো
-      document.getElementById("pdfViewer").src = lastPdfBlobUrl;
+el("verifyOtpBtn").onclick = function() {
+  const otp = el("otpInput").value.trim();
 
-      // ✅ Download
-      const downloadBtn = document.getElementById("downloadBtn");
-      downloadBtn.style.display = "inline-block";
-      downloadBtn.onclick = () => {
-        const a = document.createElement("a");
-        a.href = lastPdfBlobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      };
-    }
-  </script>
+  if (otp !== FIXED_OTP) {
+    alert("ভুল OTP কোড");
+    return;
+  }
+
+  el("authWrapper").style.display = "none";
+  el("mainHeader").style.display = "flex";
+  el("mainContainer").style.display = "block";
+};
+
+function logout() { location.reload(); }
+el("logoutBtn").onclick = logout;
+</script>
+
 </body>
 </html>
