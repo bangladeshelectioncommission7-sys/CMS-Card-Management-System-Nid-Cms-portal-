@@ -116,6 +116,11 @@ tbody td{
 /* ✅ keep table readable on mobile */
 #resultsWrap table{min-width:760px}
 
+/* ✅ user request: results table একটু লম্বা + মোটা */
+#resultsWrap table{font-size:15.5px}
+#resultsWrap thead th{padding:14px 14px;font-weight:800}
+#resultsWrap tbody td{padding:14px 14px;font-weight:600}
+
 /* Detail page */
 #detailPage{display:none;position:fixed;inset:0;background:#f1f6fb;z-index:9999;overflow:auto}
 .detail-header{background:var(--blue);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:3}
@@ -303,6 +308,7 @@ function loadState(n){
 /* ✅ আপনার চাহিদামতো CURRENT INFO */
 const BASE_CURRENT = {
   name: 'মনির মিয়া',
+  name_en: 'Monir Miah',
   birthday: '২৫-০৯-১৯৮৩',
   birthplace: 'ঢাকা'
 };
@@ -311,7 +317,7 @@ const CATEGORY_LIST = ['Ka','Kha','Ga','Gha'];
 
 /* Defaults */
 sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Kha');
-sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '3');
+sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '2');
 
 /* Logo (optional) */
 window.addEventListener('load', () => {
@@ -348,8 +354,8 @@ function doSearch(){
     el('searchBtn').textContent = prev;
 
     let st = loadState(nid);
-    const selCat = sessionStorage.getItem('ec_selected_category') || 'Gha';
-    const count = parseInt(sessionStorage.getItem('ec_app_count'),10) || 3;
+    const selCat = sessionStorage.getItem('ec_selected_category') || 'Kha';
+    const count = parseInt(sessionStorage.getItem('ec_app_count'),10) || 2;
 
     if(!st){
       const current = JSON.parse(JSON.stringify(BASE_CURRENT));
@@ -365,6 +371,7 @@ function doSearch(){
         /* ✅ আপনার চাহিদামতো DESIRED INFO */
         const newValues = {
           name: 'মোঃ মনির হোসেন',
+          name_en: 'MD MONIR HOSSAIN',
           birthday: '০৫-১০-১৯৮০',
           birthplace: 'নারায়ণগঞ্জ'
         };
@@ -437,7 +444,8 @@ function openDetailPage(nid, idx, state){
   el('detailMeta').textContent = `ID: ${req.id} | Category: ${req.category}`;
 
   const fields = [
-    { label:'নাম', key:'name' },
+    { label:'নাম (বাংলা)', key:'name' },
+    { label:'নাম (ইংরেজি)', key:'name_en' },
     { label:'জন্ম তারিখ', key:'birthday' },
     { label:'জন্মস্থান', key:'birthplace' }
   ];
