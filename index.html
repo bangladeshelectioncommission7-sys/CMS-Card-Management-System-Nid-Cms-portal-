@@ -3,287 +3,170 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>NID Correction Portal — Official</title>
+<title>NID Correction Portal — CMS</title>
+
 <style>
-:root{--blue:#0b63b6;--muted:#6b7b8f;--card-bg:#fff}
+:root{--blue:#003366;--muted:#5f6b7a;--card-bg:#fff}
 *{box-sizing:border-box}
-body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans',Arial;background:#f4f8ff;margin:0;color:#0b2447}
-header{background:var(--blue);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+
+/* ✅ Mobile white-block (horizontal overflow) fix */
+html,body{width:100%;overflow-x:hidden}
+
+body{
+  font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans',Arial;
+  background:#f1f6fb;
+  margin:0;
+  color:#0b2447;
+}
+
+header{
+  background:var(--blue);
+  color:#fff;
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between
+}
 header .brand{font-weight:700;font-size:18px}
-.container{max-width:1120px;margin:20px auto;padding:0 16px}
-.card{background:var(--card-bg);border-radius:10px;box-shadow:0 8px 30px rgba(11,38,71,0.06);overflow:hidden}
+
+.container{
+  max-width:1120px;
+  margin:20px auto;
+  padding:0 16px;
+  width:100%;
+  overflow-x:hidden;
+}
+
 .muted{color:var(--muted);font-size:13px}
-.app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--blue);color:#fff;border-radius:8px 8px 0 0}
-.panel{background:#fff;padding:18px;border-radius:0 0 8px 8px}
-.search-row{display:flex;gap:10px;margin-bottom:10px}
-.search-row input{flex:1}
-table{width:100%;border-collapse:collapse;margin-top:12px}
-thead th{background:#f2f8ff;color:#0b3a6e;text-align:left;padding:12px;border-bottom:1px solid #e9f3ff}
-tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
-.status-chip{padding:6px 10px;border-radius:14px;border:1px solid #e6f0ff;font-weight:600;font-size:13px}
-.status-pending{background:#fff8e6;border-color:#ffe8a8;color:#8a6b00}
-.status-rejected{background:#fff2f2;border-color:#f5c6cb;color:#8a1f1f}
-.status-approved{background:#f2fff6;border-color:#b7e8c7;color:#216e2b}
+
+.app-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 16px;
+  background:var(--blue);
+  color:#fff;
+  border-radius:8px 8px 0 0
+}
+
+.panel{
+  background:#e9f2fb;
+  padding:18px;
+  border-radius:0 0 8px 8px;
+  border:1px solid #cddff3;
+  width:100%;
+  overflow-x:hidden;
+}
+
+.search-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.search-row input{
+  flex:1;
+  min-width:180px;
+  padding:10px 12px;
+  border:1px solid #cddff3;
+  border-radius:8px;
+  outline:none;
+  background:#fff;
+}
+.search-row input:focus{border-color:#9bbce0;box-shadow:0 0 0 3px rgba(0,51,102,.12)}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  background:#fff;
+  border-radius:10px;
+}
+
+thead th{
+  background:#d9e8f8;
+  color:#003366;
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid #cddff3;
+  white-space:nowrap;
+}
+
+tbody td{
+  padding:12px;
+  border-bottom:1px solid #eef3f8;
+  vertical-align:middle
+}
+
+.status-chip{padding:6px 10px;border-radius:14px;border:1px solid #e6f0ff;font-weight:600;font-size:13px;display:inline-block;white-space:nowrap}
+.status-pending{background:#fff3cd;border-color:#ffe8a8;color:#856404}
+.status-rejected{background:#f8d7da;border-color:#f5c6cb;color:#721c24}
+.status-approved{background:#d4edda;border-color:#b7e8c7;color:#155724}
 .eye{cursor:pointer;font-size:18px;color:var(--blue)}
 .center{text-align:center}
+.hidden{display:none!important}
 
-#detailPage{display:none;position:fixed;inset:0;background:#f4f6f9;z-index:9999;overflow:auto}
-.detail-header{background:var(--blue);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px}
-.detail-card{max-width:1060px;margin:18px auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 8px 24px rgba(11,38,71,0.06)}
+/* ✅ Results wrap = only this area scrolls horizontally on mobile (NOT whole page) */
+#resultsWrap{
+  display:none;
+  background:#e9f2fb;
+  border:1px solid #cddff3;
+  border-radius:10px;
+  padding:8px;
+  max-width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* ✅ keep table readable on mobile */
+#resultsWrap table{min-width:760px}
+
+/* Detail page */
+#detailPage{display:none;position:fixed;inset:0;background:#f1f6fb;z-index:9999;overflow:auto}
+.detail-header{background:var(--blue);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:3}
+.detail-card{max-width:1060px;margin:18px auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.08)}
 .detail-table{width:100%;border-collapse:collapse;margin-top:8px}
 .detail-table th,.detail-table td{border:1px solid #eef6ff;padding:10px}
-.spinner{width:28px;height:28px;border-radius:50%;border:4px solid #f1f5fb;border-top-color:var(--blue);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
+.spinner{width:22px;height:22px;border-radius:50%;border:4px solid #f1f5fb;border-top-color:var(--blue);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 .msg-success{color:#0b7028;font-weight:700;margin-top:12px}
 .msg-info{color:#0b63b6;font-weight:700;margin-top:12px}
-.controls{display:flex;gap:10px;align-items:center}
-.back-btn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.back-btn{background:transparent;border:1px solid rgba(255,255,255,0.25);color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
 .footer-note{font-size:13px;color:var(--muted);margin-top:10px}
+
+/* Buttons */
+.btn{padding:10px 18px;border-radius:8px;border:none;font-weight:600;cursor:pointer;transition:all .2s;background:var(--blue);color:#fff}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:#eef4ff;color:var(--blue);border:1px solid #d6e4ff}
+.btn.secondary:hover{background:#dbe9ff}
+
+/* AUTH */
+.auth-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#003366 0%,#001f3f 100%);padding:20px}
+.auth-box{width:100%;max-width:420px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.28);overflow:hidden}
+.auth-header{background:var(--blue);color:#fff;padding:28px 24px 20px;text-align:center}
+.auth-header h2{margin:0;font-size:1.55rem;font-weight:700}
+.auth-header .subtitle{margin-top:8px;font-size:.92rem;opacity:.9}
+.auth-body{padding:28px 24px 32px;background:#fff}
+.input-group{position:relative;margin-bottom:18px}
+.input-group input{width:100%;padding:13px 16px 13px 14px;border:1px solid #cddff3;border-radius:10px;font-size:15px}
+.input-group input:focus{outline:none;border-color:#9bbce0;box-shadow:0 0 0 3px rgba(0,51,102,.12)}
+.input-group .toggle-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:1.1rem;user-select:none}
+.auth-btn{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:800;cursor:pointer}
+.auth-btn.loading{pointer-events:none;opacity:.9}
+.auth-footer{text-align:center;font-size:.81rem;color:#8899aa;padding:0 24px 24px}
+
 @media(max-width:900px){.detail-card{margin:10px}}
-
-.hidden{display:none}
-
-/* ── NEW AUTH STYLES ──────────────────────────────────────────────── */
-.auth-wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0b63b6 0%, #0a3d73 100%);
-  padding: 20px;
-}
-
-.auth-box {
-  width: 100%;
-  max-width: 420px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.28);
-  overflow: hidden;
-}
-
-.auth-header {
-  background: var(--blue);
-  color: white;
-  padding: 28px 24px 20px;
-  text-align: center;
-}
-
-.auth-header h2 {
-  margin: 0;
-  font-size: 1.55rem;
-  font-weight: 600;
-}
-
-.auth-header .subtitle {
-  margin-top: 8px;
-  font-size: 0.92rem;
-  opacity: 0.9;
-}
-
-.auth-body {
-  padding: 28px 24px 32px;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 18px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 13px 16px 13px 14px;
-  border: 1px solid #d0e0f5;
-  border-radius: 8px;
-  font-size: 15px;
-  transition: all 0.2s;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(11,99,182,0.15);
-}
-
-.input-group .toggle-eye {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: var(--muted);
-  font-size: 1.1rem;
-  user-select: none;
-}
-
-.auth-btn {
-  width: 100%;
-  padding: 13px;
-  background: var(--blue);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.auth-btn:hover {
-  background: #094e92;
-}
-
-.auth-btn.loading {
-  pointer-events: none;
-  background: #094e92;
-}
-
-.auth-footer {
-  text-align: center;
-  font-size: 0.81rem;
-  color: #8899aa;
-  padding: 0 24px 24px;
-}
-
-.btn {
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: var(--blue);
-  color: white;
-}
-
-.btn.secondary {
-  background: #eef4ff;
-  color: var(--blue);
-  border: 1px solid #d6e4ff;
-}
-
-.btn.secondary:hover {
-  background: #dbe9ff;
-}
-
-@media (max-width: 640px) {
-  .auth-box { max-width: 94%; }
-}
-
-/* ===== Mobile / overflow fixes (structure won't break) ===== */
-* { box-sizing: border-box; }
-body { overflow-x: hidden; }
-
-/* Make main wrappers truly responsive */
-.container, .wrapper, .page, .main, .card, .panel {
-  max-width: 100%;
-}
-
-/* Table container scroll on small screens */
-.table-wrap, .table-responsive, .results-table, .table-container {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* If the results table is a <table> without wrapper, ensure its parent can scroll */
-#resultsWrap { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-/* Keep table inside border, prevent text from spilling out */
-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-th, td {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* Slightly smaller text & padding on mobile so border stays aligned */
-@media (max-width: 520px) {
-  .topbar, .header, .nav { padding-left: 12px !important; padding-right: 12px !important; }
-  th, td { padding: 10px 8px !important; font-size: 12px !important; }
-  .card, .panel { border-radius: 10px !important; }
-}
-
-/* Prevent any child from exceeding viewport width */
-img, svg, canvas, video, iframe, input, select, button { max-width: 100%; }
-
-
-/* ===== v5: Full-width mobile layout fixes ===== */
-html, body { width: 100%; max-width: 100%; margin: 0; padding: 0; overflow-x: hidden; }
-
-/* Common wrapper ids/classes in this file */
-#mainContainer, #appArea, #resultsWrap, #dashboard, #content, #page, #wrapper, .wrapper, .container, .main-container, .content-area {
-  width: 100% !important;
-  max-width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-}
-
-/* Make cards/panels stretch to full width on mobile */
-.card, .panel, .box, .section, .table-card, .results-card {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-/* If table has a min-width that causes blank area, remove it */
-table, .results-table { min-width: 0 !important; }
-
-/* Table should not force huge gaps; allow horizontal scroll within wrap when needed */
-#resultsWrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
-#resultsWrap table { width: 100% !important; table-layout: auto !important; }
-
-/* Checkbox must be clickable */
-input[type="checkbox"] { pointer-events: auto !important; opacity: 1 !important; }
-input[type="checkbox"][disabled] { opacity: .6 !important; }
-
-/* Prevent any element from pushing layout beyond screen */
-* { max-width: 100%; }
-
-
-@media (max-width: 680px){
-  .header-row, .top-row, .topbar, .mainHeader, #mainHeader, .header, .nav {
-    flex-wrap: wrap !important;
-  }
-  .header-row > *, .top-row > *, .topbar > * {
-    width: 100% !important;
-  }
-}
-
-
-/* ===== v6: Table text normal (no vertical letters) ===== */
-#resultsWrap table { table-layout: auto !important; }
-#resultsWrap th, #resultsWrap td {
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-  hyphens: manual !important;
-}
-#resultsWrap th {
-  white-space: nowrap !important;
-}
-/* Keep most columns in one line; allow Applicant Name to wrap normally */
-#resultsWrap td:not(:nth-child(3)) { white-space: nowrap !important; }
-#resultsWrap td:nth-child(3) { white-space: normal !important; }
-
 </style>
 </head>
+
 <body>
 
-<!-- ── NEW LOGIN / OTP ─────────────────────────────────────────────── -->
+<!-- LOGIN / OTP -->
 <div class="auth-wrapper" id="authWrapper">
   <div class="auth-box">
-
     <div class="auth-header">
       <h2>CMS Card Management System</h2>
       <div class="subtitle">বাংলাদেশ নির্বাচন কমিশন<br>অনুমোদিত কর্মকর্তাদের জন্য</div>
     </div>
 
     <div class="auth-body">
-
-      <div id="loginSection">
+      <div id="loginSection" style="display:block;">
         <div class="input-group">
           <input type="text" id="userId" placeholder="User ID / ইউজার আইডি" autocomplete="off">
         </div>
@@ -291,34 +174,25 @@ input[type="checkbox"][disabled] { opacity: .6 !important; }
           <input type="password" id="userPass" placeholder="পাসওয়ার্ড" autocomplete="off">
           <span class="toggle-eye" onclick="togglePass()">👁</span>
         </div>
-
-        <div class="input-group">
-          <select id="userRole" style="width:100%; padding:13px 16px; border:1px solid #d0e0f5; border-radius:8px; font-size:15px; background:#fff;">
-            <option value="OFFICER">Officer</option>
-            <option value="OPERATOR">Operator</option>
-            <option value="DG">DG</option>
-          </select>
-        </div>
-        <button class="auth-btn" id="loginBtn">লগইন করুন</button>
+        <button class="auth-btn" id="loginBtn" type="button">লগইন করুন</button>
       </div>
 
-      <div id="otpSection" class="hidden" style="display:none">
+      <div id="otpSection" style="display:none;">
         <div style="text-align:center; margin-bottom:20px; color:#334155;">
           <strong>OTP যাচাই</strong><br>
           <small>আপনার মোবাইলে পাঠানো ৬ সংখ্যার কোডটি প্রবেশ করান</small>
         </div>
         <div class="input-group">
-          <input type="text" id="otpInput" placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="otpInput"
+                 placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code">
         </div>
-        <button class="auth-btn" id="verifyOtpBtn">যাচাই করুন</button>
+        <button class="auth-btn" id="verifyOtpBtn" type="button">যাচাই করুন</button>
       </div>
-
     </div>
 
     <div class="auth-footer">
-      Bangladesh Election Commission • CMS Protected • © 2026-2027 BEC
+      বাংলাদেশ নির্বাচন কমিশন • CMS Protected • © 2025-2026 BEC
     </div>
-
   </div>
 </div>
 
@@ -328,29 +202,29 @@ input[type="checkbox"][disabled] { opacity: .6 !important; }
 </header>
 
 <div class="container" style="display:none" id="mainContainer">
-  <!-- ✅ Login বাদ: সরাসরি App Area -->
   <div id="appArea">
     <div class="app-header">
       <div style="display:flex;align-items:center;gap:12px">
         <img id="topLogo" src="" alt="" style="height:44px;display:none;border-radius:6px;padding:4px;background:#fff"/>
         <div>
-          <div style="font-weight:700">NID Correction Portal</div>
+          <div style="font-weight:800">NID Correction Portal</div>
           <div style="font-size:13px" class="muted">Search and review correction requests</div>
         </div>
       </div>
       <div style="display:flex;gap:12px;align-items:center">
-        <div id="loggedUser" class="muted" style="display:none"></div>
-        <button class="btn" id="logoutBtn" style="display:none">Logout</button>
+        <button class="btn secondary" id="logoutBtn" type="button">Logout</button>
       </div>
     </div>
 
     <div class="panel">
       <div class="search-row">
-        <input id="nidInput" type="text" placeholder="Enter NID "/>
-        <button class="btn" id="searchBtn">Search</button>
+        <input id="nidInput" type="text" placeholder="Enter NID"/>
+        <button class="btn" id="searchBtn" type="button">Search</button>
       </div>
+
       <div id="searchMsg" style="display:none;color:#c0392b;margin-bottom:8px"></div>
-      <div id="resultsWrap" style="display:none">
+
+      <div id="resultsWrap">
         <table>
           <thead>
             <tr>
@@ -367,171 +241,172 @@ input[type="checkbox"][disabled] { opacity: .6 !important; }
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
-      </div>
+
+      <div class="footer-note">বাংলাদেশ নির্বাচন কমিশন সচিবালয়।</div>
+    </div>
   </div>
 </div>
 
-<!-- ✅ DETAIL PAGE (Approve/Cancel/Rollback সব আছে) -->
-<div id="detailPage" style="display:none">
+<!-- DETAIL PAGE -->
+<div id="detailPage">
   <div class="detail-header">
-    <button class="back-btn" id="backToMain">← Back</button>
-    <div style="font-weight:700">Applied Change</div>
+    <button class="back-btn" id="backToMain" type="button">← Back</button>
+    <div style="font-weight:800">Applied Change</div>
   </div>
+
   <div class="detail-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-size:16px;font-weight:700;color:#0b3a6e" id="detailTitle">Application Details</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+      <div style="font-size:16px;font-weight:800;color:#003366" id="detailTitle">Application Details</div>
       <div class="muted" id="detailMeta">ID: - | Category: -</div>
     </div>
 
     <table class="detail-table">
       <thead>
-        <tr style="background:#f7fbff;color:#0b3a6e">
+        <tr style="background:#f7fbff;color:#003366">
           <th style="width:48px;text-align:center"></th>
           <th>Field</th>
-          <th>Old Value</th>
-          <th>New Value</th>
+          <th>বর্তমান তথ্য</th>
+          <th>চাহিত তথ্য</th>
         </tr>
       </thead>
       <tbody id="detailRows"></tbody>
     </table>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;flex-wrap:wrap">
       <div id="detailNote" class="muted">Notes: none</div>
+
       <div class="controls">
         <div id="detailLoader" style="display:none">
           <span class="spinner"></span><span style="margin-left:8px" class="muted">Processing...</span>
         </div>
-        <button id="approveBtn" class="btn">Approve</button>
-        <button id="cancelBtn" class="btn secondary">Cancel</button>
-        <button id="rollbackBtn" class="btn secondary" style="display:none">Rollback</button>
+        <button id="approveBtn" class="btn" type="button">Approve</button>
+        <button id="cancelBtn" class="btn secondary" type="button">Cancel</button>
+        <button id="rollbackBtn" class="btn secondary" style="display:none" type="button">Rollback</button>
       </div>
     </div>
+
     <div id="detailMsg" style="display:none;margin-top:12px"></div>
   </div>
 </div>
 
 <script>
-/* ===== Original Data ===== */
-const BASE_CURRENT = { নাম: 'আতিকুর রহমান', name: 'Atikur Rahman', birthday: '04-03-1988'};
-const CATEGORY_LIST = ['Ga'];
-
-/* ===== Defaults (NO local storage (disabled)/session storage (disabled)) ===== */
-let ec_selected_category = 'Ga';
-let ec_app_count = 3;
-let ec_last_nid = null;
-
-// In-memory state store: { nid: { current, requests } }
-const MEMORY_DB = Object.create(null);
-
-function storageKey(n) { return 'ec_nid_' + n }
-function saveState(n, o) {
-  // NO local storage (disabled): keep in memory only
-  MEMORY_DB[n] = JSON.parse(JSON.stringify(o));
+/* ===== Helpers ===== */
+function el(id){ return document.getElementById(id); }
+function uuid(){ return 'APP' + Math.random().toString(36).slice(2, 9).toUpperCase(); }
+function storageKey(n){ return 'ec_nid_' + n; }
+function saveState(n, o){ localStorage.setItem(storageKey(n), JSON.stringify(o)); }
+function loadState(n){
+  const v = localStorage.getItem(storageKey(n));
+  return v ? JSON.parse(v) : null;
 }
 
-function loadState(n) {
-  // NO local storage (disabled): read from memory only
-  const v = MEMORY_DB[n];
-  return v ? JSON.parse(JSON.stringify(v)) : null;
-}
+/* ✅ আপনার চাহিদামতো CURRENT INFO */
+const BASE_CURRENT = {
+  name: 'মনির মিয়া',
+  birthday: '২৫-০৯-১৯৮৩',
+  birthplace: 'ঢাকা'
+};
 
-function el(id) { return document.getElementById(id) }
-function uuid() { return 'APP' + Math.random().toString(36).slice(2, 9).toUpperCase() }
+const CATEGORY_LIST = ['Ka','Kha','Ga','Gha'];
 
-/* ===== Logo load =====
-   Disabled: NO local storage (disabled) in this build.
-   If you want a logo, set <img id="topLogo" src="..."> directly in HTML.
-*/
-/* ===== Search Events ===== */
+/* Defaults */
+sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Kha');
+sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '3');
+
+/* Logo (optional) */
+window.addEventListener('load', () => {
+  const l = localStorage.getItem('ec_logo');
+  if (l && el('topLogo')) {
+    el('topLogo').src = l;
+    el('topLogo').style.display = 'block';
+  }
+});
+
+/* Search */
 el('searchBtn').onclick = doSearch;
-el('nidInput').onkeydown = e => { if (e.key === 'Enter') doSearch() };
+el('nidInput').onkeydown = e => { if(e.key==='Enter') doSearch(); };
 
-function doSearch() {
+function doSearch(){
   const nid = el('nidInput').value.trim();
   const msg = el('searchMsg');
-  msg.style.display = 'none';
-  el('resultsWrap').style.display = 'none';
 
-  if (!nid || nid.length < 5) {
-    msg.textContent = 'Please enter a valid NID.';
-    msg.style.display = 'block';
+  msg.style.display='none';
+  el('resultsWrap').style.display='none';
+
+  if(!nid || nid.length < 5){
+    msg.textContent='Please enter a valid NID.';
+    msg.style.display='block';
     return;
   }
 
-  const btn = el('searchBtn');
-  btn.disabled = true;
-  const prevText = btn.textContent;
-  btn.innerHTML = '<span class="spinner"></span>';
+  el('searchBtn').disabled = true;
+  const prev = el('searchBtn').textContent;
+  el('searchBtn').innerHTML = '<span class="spinner"></span>';
 
-  // failsafe (never stuck)
-  if (window.__searchFailsafe) clearTimeout(window.__searchFailsafe);
-  window.__searchFailsafe = setTimeout(() => {
-    btn.disabled = false;
-    btn.textContent = prevText;
-  }, 8000);
+  setTimeout(()=>{
+    el('searchBtn').disabled = false;
+    el('searchBtn').textContent = prev;
 
-  setTimeout(() => {
-    try {
-      let st = loadState(nid);
-      const selCat = ec_selected_category || 'Ga';
-      const count = 1;
+    let st = loadState(nid);
+    const selCat = sessionStorage.getItem('ec_selected_category') || 'Gha';
+    const count = parseInt(sessionStorage.getItem('ec_app_count'),10) || 3;
 
-      if (!st) {
-        const current = JSON.parse(JSON.stringify(BASE_CURRENT));
-        current.nid = nid;
+    if(!st){
+      const current = JSON.parse(JSON.stringify(BASE_CURRENT));
+      current.nid = nid;
 
-        const requests = [];
-        const startIdx = Math.max(0, CATEGORY_LIST.indexOf(selCat));
-        for (let i = 0; i < count; i++) {
-          const cat = CATEGORY_LIST[(startIdx + i) % CATEGORY_LIST.length];
-          const status = i < count - 1 ? 'Rejected' : 'Pending';
-          const newValues = { নাম: 'মোঃ আনিসুর রহমান', name: 'MD ANISUR RAHMAN', birthday: '05-03-1990' };
-          const oldValues = JSON.parse(JSON.stringify(current));
-          requests.push({
-            id: uuid(),
-            category: cat,
-            status,
-            oldValues,
-            newValues,
-            notes: 'সংশোধনের অনুরোধ',
-            previousApplied: null
-          });
-        }
-        st = { current, requests };
-        saveState(nid, st);
+      const requests = [];
+      const startIdx = Math.max(0, CATEGORY_LIST.indexOf(selCat));
+
+      for(let i=0;i<count;i++){
+        const cat = CATEGORY_LIST[(startIdx+i)%4];
+        const status = (i < count-1) ? 'Rejected' : 'Pending';
+
+        /* ✅ আপনার চাহিদামতো DESIRED INFO */
+        const newValues = {
+          name: 'মোঃ মনির হোসেন',
+          birthday: '০৫-১০-১৯৮০',
+          birthplace: 'নারায়ণগঞ্জ'
+        };
+
+        const oldValues = JSON.parse(JSON.stringify(current));
+
+        requests.push({
+          id: uuid(),
+          category: cat,
+          status,
+          oldValues,
+          newValues,
+          notes: 'সংশোধনের অনুরোধ',
+          previousApplied: null
+        });
       }
 
-      ec_last_nid = nid;
-      renderResults(nid, st);
-      el('resultsWrap').style.display = 'block';
-    } catch (e) {
-      console.error(e);
-      msg.textContent = 'Search error. Please try again.';
-      msg.style.display = 'block';
-    } finally {
-      clearTimeout(window.__searchFailsafe);
-      window.__searchFailsafe = null;
-      btn.disabled = false;
-      btn.textContent = prevText;
+      st = { current, requests };
+      saveState(nid, st);
     }
+
+    sessionStorage.setItem('ec_last_nid', nid);
+    renderResults(nid, st);
+    el('resultsWrap').style.display='block';
   }, 700);
 }
 
-function renderResults(nid, state) {
+function renderResults(nid, state){
   const tbody = el('resultsBody');
   tbody.innerHTML = '';
 
-  state.requests.forEach((r, idx) => {
+  state.requests.forEach((r, idx)=>{
     const tr = document.createElement('tr');
-    const nameDisplay = state.current.name;
-    const statusClass = r.status.includes('Approved')
+
+    const statusClass = (r.status||'').includes('Approved')
       ? 'status-approved'
-      : (r.status === 'Pending' ? 'status-pending' : 'status-rejected');
+      : (r.status==='Pending' ? 'status-pending' : 'status-rejected');
 
     tr.innerHTML = `
       <td><input type="checkbox"/></td>
       <td class="muted">${r.id}</td>
-      <td>${nameDisplay}</td>
+      <td>${state.current?.name || '-'}</td>
       <td>${nid}</td>
       <td><span class="status-chip ${statusClass}">${r.status}</span></td>
       <td>${r.category}</td>
@@ -541,18 +416,18 @@ function renderResults(nid, state) {
     tbody.appendChild(tr);
   });
 
-  // Re-attach eye click events
-  document.querySelectorAll('.eye').forEach(e => {
-    e.onclick = () => {
-      const idx = parseInt(e.getAttribute('data-idx'));
-      const n = ec_last_nid;
+  document.querySelectorAll('.eye').forEach(e=>{
+    e.onclick = ()=>{
+      const idx = parseInt(e.getAttribute('data-idx'),10);
+      const n = sessionStorage.getItem('ec_last_nid');
       const s = loadState(n);
-      if (s) openDetailPage(n, idx, s);
+      if(s) openDetailPage(n, idx, s);
     };
   });
 }
 
-function openDetailPage(nid, idx, state) {
+/* Detail Page */
+function openDetailPage(nid, idx, state){
   el('appArea').style.display = 'none';
   el('detailPage').style.display = 'block';
 
@@ -562,19 +437,19 @@ function openDetailPage(nid, idx, state) {
   el('detailMeta').textContent = `ID: ${req.id} | Category: ${req.category}`;
 
   const fields = [
-    { label: 'নাম (বাংলা)', key: 'নাম' },
-    { label: 'Name (ইংরেজি)', key: 'name' },
-    { label: 'জন্ম তারিখ', key: 'birthday' },
+    { label:'নাম', key:'name' },
+    { label:'জন্ম তারিখ', key:'birthday' },
+    { label:'জন্মস্থান', key:'birthplace' }
   ];
 
   const tbody = el('detailRows');
   tbody.innerHTML = '';
-  fields.forEach((f, i) => {
-    const oldV = req.oldValues[f.key] || '-';
-    const newV = req.newValues[f.key] || '-';
+  fields.forEach((f,i)=>{
+    const oldV = req.oldValues?.[f.key] ?? '-';
+    const newV = req.newValues?.[f.key] ?? '-';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="text-align:center"><input type="checkbox" ${i < 4 ? 'checked' : ''}></td>
+      <td style="text-align:center"><input type="checkbox" ${i<2?'checked':''}></td>
       <td>${f.label}</td>
       <td>${oldV}</td>
       <td>${newV}</td>
@@ -590,265 +465,158 @@ function openDetailPage(nid, idx, state) {
   const loader = el('detailLoader');
   const msg = el('detailMsg');
 
-  msg.style.display = 'none';
-  loader.style.display = 'none';
+  msg.style.display='none';
+  loader.style.display='none';
+
   approveBtn.disabled = false;
   cancelBtn.disabled = false;
 
-  // Reset visibility based on current status
-  if (req.status.includes('Approved')) {
-    approveBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
-    rollbackBtn.style.display = 'inline-block';
-    msg.style.display = 'block';
-    msg.className = 'msg-success';
-    msg.textContent = 'Approval successful.';
-  } else if (req.status === 'Rejected') {
-    approveBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
-    rollbackBtn.style.display = 'inline-block';
-    msg.style.display = 'block';
-    msg.className = 'msg-info';
-    msg.textContent = 'This application is rejected.';
-  } else {
-    approveBtn.style.display = 'inline-block';
-    cancelBtn.style.display = 'inline-block';
-    rollbackBtn.style.display = 'none';
+  if((req.status||'').includes('Approved')){
+    approveBtn.style.display='none';
+    cancelBtn.style.display='none';
+    rollbackBtn.style.display='inline-block';
+    msg.style.display='block';
+    msg.className='msg-success';
+    msg.textContent='Approval successful.';
+  }else if(req.status==='Rejected'){
+    approveBtn.style.display='none';
+    cancelBtn.style.display='none';
+    rollbackBtn.style.display='inline-block';
+    msg.style.display='block';
+    msg.className='msg-info';
+    msg.textContent='This application is rejected.';
+  }else{
+    approveBtn.style.display='inline-block';
+    cancelBtn.style.display='inline-block';
+    rollbackBtn.style.display='none';
   }
 
-  approveBtn.onclick = () => {
-    // Clear timers so messages don't overlap
-    if (window.__approveAutoRollbackTimer) clearTimeout(window.__approveAutoRollbackTimer);
-    
-    // UI start
-    loader.style.display = 'inline-block';
-    approveBtn.disabled = true;
-    cancelBtn.disabled = true;
-    rollbackBtn.disabled = true;
-    msg.style.display = 'none';
+  approveBtn.onclick = ()=>{
+    approveBtn.disabled=true;
+    cancelBtn.disabled=true;
+    loader.style.display='inline-block';
 
-    // Immediate success text (as you want)
-    msg.style.display = 'block';
-    msg.className = 'msg-success';
-    msg.textContent = 'অনুমোদন সফল হয়েছে।';
+    setTimeout(()=>{
+      loader.style.display='none';
 
-    // Safety: never keep loader spinning forever
-    if (window.__approveLoaderFailsafe) clearTimeout(window.__approveLoaderFailsafe);
-    window.__approveLoaderFailsafe = setTimeout(() => {
-      loader.style.display = 'none';
-      approveBtn.disabled = false;
-      cancelBtn.disabled = false;
-    }, 2500);
-
-    // Apply + render quickly
-    setTimeout(() => {
-      try {
-        const prevApplied = JSON.parse(JSON.stringify(state.current));
-        const req = state.requests[idx];
-
-        // Apply new values into current (only matching keys)
-        Object.keys(req.newValues || {}).forEach(k => {
-          if (k in state.current) state.current[k] = req.newValues[k];
-        });
-
-        req.status = 'Approved';
-        req.previousApplied = prevApplied;
-
-        saveState(nid, state);
-
-        // Buttons
-        approveBtn.style.display = 'none';
-        cancelBtn.style.display = 'none';
-        rollbackBtn.style.display = 'inline-block';
-        rollbackBtn.disabled = false;
-
-        renderResults(nid, state);
-      } catch (e) {
-        console.error(e);
-        msg.style.display = 'block';
-        msg.className = 'msg-info';
-        msg.textContent = 'সিস্টেম এরর হয়েছে, আবার চেষ্টা করুন।';
-        approveBtn.disabled = false;
-        cancelBtn.disabled = false;
-      } finally {
-        loader.style.display = 'none';
-        if (window.__approveLoaderFailsafe) {
-          clearTimeout(window.__approveLoaderFailsafe);
-          window.__approveLoaderFailsafe = null;
-        }
-      }
-    }, 400);
-
-    // 15 seconds পরে অটোমেটিক rollback হবে
-    window.__approveAutoRollbackTimer = setTimeout(() => {
-      const st = loadState(nid);
-      if (!st || !st.requests || !st.requests[idx]) return;
-
-      const r = st.requests[idx];
-      if (r.previousApplied) {
-        st.current = JSON.parse(JSON.stringify(r.previousApplied));
-        r.previousApplied = null;
-      }
-      r.status = 'Pending';
-      saveState(nid, st);
-
-      try { renderResults(nid, st); } catch (e) { console.error(e); }
-
-      // 10 seconds AFTER rollback: show DG notice message
-      if (window.__rollbackDGMsgTimer) clearTimeout(window.__rollbackDGMsgTimer);
-      window.__rollbackDGMsgTimer = setTimeout(() => {
-        msg.style.display = 'block';
-        msg.className = 'msg-info';
-        msg.textContent = 'এটি জন্ম তারিখ সংশোধন শুধু মাত্র DG মহোদয় করতে পারবেন।';
-        window.__rollbackDGMsgTimer = null;
-      }, 10000);
-      window.__approveAutoRollbackTimer = null;
-    }, 15000);
-  };
-
-  cancelBtn.onclick = () => {
-    if (!confirm('Are you sure to reject this application?')) return;
-
-    approveBtn.disabled = true;
-    cancelBtn.disabled = true;
-    loader.style.display = 'inline-block';
-
-    setTimeout(() => {
-    CURRENT_ROLE = role;
-      loader.style.display = 'none';
-
-      // Update ONLY this request
-      req.previousApplied = null;
-      state.requests[idx].status = 'Rejected';
-
+      req.previousApplied = JSON.parse(JSON.stringify(state.current));
+      state.current = { ...state.current, ...req.newValues };
+      state.requests[idx].status = 'Approved by ' + req.category;
       saveState(nid, state);
 
-      msg.style.display = 'block';
-      msg.className = 'msg-info';
-      msg.textContent = 'Application rejected.';
+      msg.style.display='block';
+      msg.className='msg-success';
+      msg.textContent='অনুমোদন সফল হয়েছে।';
 
-      approveBtn.style.display = 'none';
-      cancelBtn.style.display = 'none';
-      rollbackBtn.style.display = 'inline-block';
+      approveBtn.style.display='none';
+      cancelBtn.style.display='none';
+      rollbackBtn.style.display='inline-block';
+
+      renderResults(nid, state);
+    }, 1200);
+  };
+
+  cancelBtn.onclick = ()=>{
+    if(!confirm('Are you sure to reject this application?')) return;
+
+    approveBtn.disabled=true;
+    cancelBtn.disabled=true;
+    loader.style.display='inline-block';
+
+    setTimeout(()=>{
+      loader.style.display='none';
+
+      req.previousApplied = null;
+      state.requests[idx].status = 'Rejected';
+      saveState(nid, state);
+
+      msg.style.display='block';
+      msg.className='msg-info';
+      msg.textContent='Application rejected.';
+
+      approveBtn.style.display='none';
+      cancelBtn.style.display='none';
+      rollbackBtn.style.display='inline-block';
 
       renderResults(nid, state);
     }, 900);
   };
 
-  rollbackBtn.onclick = () => {
-    loader.style.display = 'inline-block';
+  rollbackBtn.onclick = ()=>{
+    loader.style.display='inline-block';
 
-    // Clear previous timer (if user clicks again)
-    if (window.__rollbackMsgTimer) {
-      clearTimeout(window.__rollbackMsgTimer);
-      window.__rollbackMsgTimer = null;
-    }
+    setTimeout(()=>{
+      loader.style.display='none';
 
-    // Do the rollback processing (fast), but show the DG notice message AFTER 6 seconds
-    setTimeout(() => {
-      loader.style.display = 'none';
-
-      if (req.previousApplied) {
+      if(req.previousApplied){
         state.current = JSON.parse(JSON.stringify(req.previousApplied));
         req.previousApplied = null;
       }
-
-      // Revert ONLY this request's status
       state.requests[idx].status = 'Pending';
-
       saveState(nid, state);
 
-      // Buttons
-      approveBtn.style.display = 'inline-block';
-      cancelBtn.style.display = 'inline-block';
-      rollbackBtn.style.display = 'none';
+      msg.style.display='block';
+      msg.className='msg-info';
+      msg.textContent='Reverted to Pending.';
+
+      approveBtn.style.display='inline-block';
+      cancelBtn.style.display='inline-block';
+      rollbackBtn.style.display='none';
 
       renderResults(nid, state);
-
-      // 10 seconds AFTER rollback: show DG notice message
-      if (window.__rollbackDGMsgTimer) clearTimeout(window.__rollbackDGMsgTimer);
-      window.__rollbackDGMsgTimer = setTimeout(() => {
-        msg.style.display = 'block';
-        msg.className = 'msg-info';
-        msg.textContent = 'এটি জন্ম তারিখ সংশোধন শুধু মাত্র DG মহোদয় করতে পারবেন।';
-        window.__rollbackDGMsgTimer = null;
-      }, 10000);
     }, 900);
-
-    // Show message after 6 seconds (5/7 sec requirement; here = 6 sec)
-    window.__rollbackMsgTimer = setTimeout(() => {
-      msg.style.display = 'block';
-      msg.className = 'msg-info';
-      msg.textContent = 'এটি জন্ম তারিখ সংশোধন শুধু মাত্র DG মহোদয় করতে পারবেন।';
-      window.__rollbackMsgTimer = null;
-    }, 6000);
   };
 
-  el('backToMain').onclick = () => {
-    el('detailPage').style.display = 'none';
-    el('appArea').style.display = 'block';
-    const n = ec_last_nid;
-    if (n) {
+  el('backToMain').onclick = ()=>{
+    el('detailPage').style.display='none';
+    el('appArea').style.display='block';
+
+    const n = sessionStorage.getItem('ec_last_nid');
+    if(n){
       const s = loadState(n);
-      if (s) renderResults(n, s);
+      if(s) renderResults(n, s);
     }
   };
 }
 
-// Login flow remains the same...
+/* Login + OTP */
 const FIXED_OTP = "707390";
-let CURRENT_ROLE = 'OFFICER';
 
-function togglePass() {
+function togglePass(){
   const p = el('userPass');
-  p.type = p.type === "password" ? "text" : "password";
+  p.type = (p.type === 'password') ? 'text' : 'password';
 }
 
-el("loginBtn").onclick = function() {
-  const uid = el("userId").value.trim();
-  const pass = el("userPass").value.trim();
-  const role = (el("userRole") && el("userRole").value) ? el("userRole").value : 'OFFICER';
-
-  if (!uid || !pass) {
-    alert("ইউজার আইডি ও পাসওয়ার্ড দিন");
+el('loginBtn').onclick = function(){
+  const uid = el('userId').value.trim();
+  const pass = el('userPass').value.trim();
+  if(!uid || !pass){
+    alert('ইউজার আইডি ও পাসওয়ার্ড দিন');
     return;
   }
-
-  this.textContent = "যাচাই হচ্ছে...";
-  this.classList.add("loading");
-
-  setTimeout(() => {
-    CURRENT_ROLE = role;
-    el("loginSection").style.display = "none";
-    el("otpSection").style.display = "block";
-    this.textContent = "লগইন করুন";
-    this.classList.remove("loading");
-  }, 1400);
+  this.textContent = 'যাচাই হচ্ছে...';
+  this.classList.add('loading');
+  setTimeout(()=>{
+    el('loginSection').style.display='none';
+    el('otpSection').style.display='block';
+    this.textContent='লগইন করুন';
+    this.classList.remove('loading');
+  }, 1200);
 };
 
-el("verifyOtpBtn").onclick = function() {
-  const otp = el("otpInput").value.trim();
-
-  if (otp !== FIXED_OTP) {
-    alert("ভুল OTP কোড");
+el('verifyOtpBtn').onclick = function(){
+  const otp = el('otpInput').value.trim();
+  if(otp !== FIXED_OTP){
+    alert('ভুল OTP কোড');
     return;
   }
-
-  el("authWrapper").style.display = "none";
-  el("mainHeader").style.display = "flex";
-  el("mainContainer").style.display = "block";
-
-  // show user info
-  const uid = el("userId").value.trim() || 'User';
-  if (el('loggedUser')) {
-    el('loggedUser').textContent = `Logged in: ${uid} (${CURRENT_ROLE})`;
-    el('loggedUser').style.display = 'block';
-  }
-  if (el('logoutBtn')) el('logoutBtn').style.display = 'inline-block';
+  el('authWrapper').style.display='none';
+  el('mainHeader').style.display='flex';
+  el('mainContainer').style.display='block';
 };
 
-function logout() { location.reload(); }
-el("logoutBtn").onclick = logout;
+/* Logout */
+el('logoutBtn').onclick = ()=> location.reload();
 </script>
 
 </body>
