@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>NID Correction Portal — Official</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root{--blue:#0b63b6;--muted:#6b7b8f;--card-bg:#fff}
         *{box-sizing:border-box}
@@ -61,492 +62,399 @@
     </style>
 </head>
 <body>
-
-<div class="auth-wrapper" id="authWrapper">
-    <div class="auth-box">
-        <div class="auth-header">
-            <h2>CMS Card Management System</h2>
-            <div class="subtitle">বাংলাদেশ নির্বাচন কমিশন<br>অনুমোদিত কর্মকর্তাদের জন্য</div>
-        </div>
-        <div class="auth-body">
-            <div id="loginSection">
-                <div class="input-group">
-                    <input type="text" id="userId" placeholder="User ID / ইউজার আইডি" autocomplete="off">
-                </div>
-                <div class="input-group">
-                    <input type="password" id="userPass" placeholder="পাসওয়ার্ড" autocomplete="off">
-                    <span class="toggle-eye" onclick="togglePass()">👁</span>
-                </div>
-                <button class="auth-btn" id="loginBtn">লগইন করুন</button>
+    <div class="auth-wrapper" id="authWrapper">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h2>CMS Card Management System</h2>
+                <div class="subtitle">বাংলাদেশ নির্বাচন কমিশন<br>অনুমোদিত কর্মকর্তাদের জন্য</div>
             </div>
-            <div id="otpSection" class="hidden" style="display:none">
-                <div style="text-align:center; margin-bottom:20px; color:#334155;">
-                    <strong>OTP যাচাই</strong><br>
-                    <small>আপনার মোবাইলে পাঠানো ৬ সংখ্যার কোডটি প্রবেশ করান</small>
+            <div class="auth-body">
+                <div id="loginSection">
+                    <div class="input-group">
+                        <input type="text" id="userId" placeholder="User ID / ইউজার আইডি" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="userPass" placeholder="পাসওয়ার্ড" autocomplete="off">
+                        <span class="toggle-eye" onclick="togglePass()">👁</span>
+                    </div>
+                    <button class="auth-btn" id="loginBtn">লগইন করুন</button>
                 </div>
-                <div class="input-group">
-                    <input type="text" id="otpInput" placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+                <div id="otpSection" class="hidden">
+                    <div style="text-align:center; margin-bottom:20px; color:#334155;">
+                        <strong>OTP যাচাই</strong><br>
+                        <small>আপনার মোবাইলে পাঠানো ৬ সংখ্যার কোডটি প্রবেশ করান</small>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="otpInput" placeholder="৬ সংখ্যার OTP" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+                    </div>
+                    <button class="auth-btn" id="verifyOtpBtn">যাচাই করুন</button>
                 </div>
-                <button class="auth-btn" id="verifyOtpBtn">যাচাই করুন</button>
             </div>
-        </div>
-        <div class="auth-footer">
-            Bangladesh Election Commission • CMS Protected • © 2026-2027 BEC
+            <div class="auth-footer">
+                Bangladesh Election Commission • CMS Protected • © 2026-2027 BEC
+            </div>
         </div>
     </div>
-</div>
-
-<header style="display:none" id="mainHeader">
-    <div class="brand">Bangladesh Election Commission</div>
-    <div class="muted">NID Correction Management</div>
-</header>
-
-<div class="container" style="display:none" id="mainContainer">
-    <div id="appArea">
-        <div class="app-header">
-            <div style="display:flex;align-items:center;gap:12px">
-                <img id="topLogo" src="" alt="" style="height:44px;display:none;border-radius:6px;padding:4px;background:#fff"/>
-                <div>
-                    <div style="font-weight:700">NID Correction Portal</div>
-                    <div style="font-size:13px" class="muted">Search and review correction requests</div>
+    <header style="display:none" id="mainHeader">
+        <div class="brand">Bangladesh Election Commission</div>
+        <div class="muted">NID Correction Management</div>
+    </header>
+    <div class="container" style="display:none" id="mainContainer">
+        <div id="appArea">
+            <div class="app-header">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <img id="topLogo" src="" alt="" style="height:44px;display:none;border-radius:6px;padding:4px;background:#fff"/>
+                    <div>
+                        <div style="font-weight:700">NID Correction Portal</div>
+                        <div style="font-size:13px" class="muted">Search and review correction requests</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:center">
+                    <div id="loggedUser" class="muted" style="display:none"></div>
+                    <button class="btn" id="logoutBtn" style="display:none">Logout</button>
                 </div>
             </div>
-            <div style="display:flex;gap:12px;align-items:center">
-                <div id="loggedUser" class="muted" style="display:none"></div>
-                <button class="btn" id="logoutBtn" style="display:none">Logout</button>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="search-row">
-                <input id="nidInput" type="text" placeholder="Enter NID "/>
-                <button class="btn" id="searchBtn">Search</button>
-            </div>
-            <div id="searchMsg" style="display:none;color:#c0392b;margin-bottom:8px"></div>
-
-            <div id="resultsWrap" style="display:none">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width:36px"></th>
-                            <th>ID</th>
-                            <th>Applicant Name</th>
-                            <th>NID</th>
-                            <th>Status</th>
-                            <th>Category</th>
-                            <th>Source</th>
-                            <th style="width:80px">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsBody"></tbody>
-                </table>
-            </div>
-
-            <div class="footer-note">উক্ত জাতীয় পরিচয় পত্র তথ্য অনুসন্ধান — সরাসরি বাংলাদেশ নির্বাচন কমিশনের ডাটাবেইজ থেকে প্রাপ্ত।</div>
-        </div>
-    </div>
-</div>
-
-<div id="detailPage" style="display:none">
-    <div class="detail-header">
-        <button class="back-btn" id="backToMain">← Back</button>
-        <div style="font-weight:700">Applied Change</div>
-    </div>
-    <div class="detail-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div style="font-size:16px;font-weight:700;color:#0b3a6e" id="detailTitle">Application Details</div>
-            <div class="muted" id="detailMeta">ID: - | Category: -</div>
-        </div>
-
-        <table class="detail-table">
-            <thead>
-                <tr style="background:#f7fbff;color:#0b3a6e">
-                    <th style="width:48px;text-align:center"></th>
-                    <th>Field</th>
-                    <th>Old Value</th>
-                    <th>New Value</th>
-                </tr>
-            </thead>
-            <tbody id="detailRows"></tbody>
-        </table>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-            <div id="detailNote" class="muted">Notes: none</div>
-            <div class="controls">
-                <div id="detailLoader" style="display:none">
-                    <span class="spinner"></span><span style="margin-left:8px" class="muted">Processing...</span>
+            <div class="panel">
+                <div class="search-row">
+                    <input id="nidInput" type="text" placeholder="Enter NID "/>
+                    <button class="btn" id="searchBtn">Search</button>
                 </div>
-                <button id="approveBtn" class="btn">Approve</button>
-                <button id="cancelBtn" class="btn secondary">Reject</button>
-                <button id="rollbackBtn" class="btn secondary" style="display:none">Rollback</button>
+                <div id="searchMsg" style="display:none;color:#c0392b;margin-bottom:8px"></div>
+                <div id="resultsWrap" style="display:none">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:36px"></th>
+                                <th>ID</th>
+                                <th>Applicant Name</th>
+                                <th>NID</th>
+                                <th>Status</th>
+                                <th>Category</th>
+                                <th>Source</th>
+                                <th style="width:80px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody"></tbody>
+                    </table>
+                </div>
+                <div class="footer-note">উক্ত জাতীয় পরিচয় পত্র তথ্য অনুসন্ধান — সরাসরি বাংলাদেশ নির্বাচন কমিশনের ডাটাবেইজ থেকে প্রাপ্ত।</div>
             </div>
         </div>
-
-        <div id="detailMsg" style="display:none;margin-top:12px"></div>
     </div>
-</div>
-
-<script>
-    const BASE_CURRENT = {
-        নাম: 'মোঃ দেলোয়ার',
-        name: 'MD. DELOWAR',
-        education: 'মাধ্যমিক'
-    };
-
-    const CATEGORY_LIST = ['Kha'];
-
-    sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Kha');
-
-    function storageKey(n) { return 'ec_nid_' + n }
-
-    function saveState(n, o) {
-        localStorage.setItem(storageKey(n), JSON.stringify(o));
-    }
-
-    function loadState(n) {
-        const v = localStorage.getItem(storageKey(n));
-        return v ? JSON.parse(v) : null;
-    }
-
-    function el(id) { return document.getElementById(id) }
-
-    function uuid() {
-        return 'APP' + Math.random().toString(36).slice(2, 9).toUpperCase();
-    }
-
-    window.addEventListener('load', () => {
-        const l = localStorage.getItem('ec_logo');
-        if (l && el('topLogo')) {
-            el('topLogo').src = l;
-            el('topLogo').style.display = 'block';
-        }
-    });
-
-    el('searchBtn').onclick = doSearch;
-    el('nidInput').onkeydown = e => { if (e.key === 'Enter') doSearch() };
-
-    function doSearch() {
-        const nid = el('nidInput').value.trim();
-        const msg = el('searchMsg');
-        msg.style.display = 'none';
-        el('resultsWrap').style.display = 'none';
-
-        if (!nid || nid.length < 5) {
-            msg.textContent = 'Please enter a valid NID.';
-            msg.style.display = 'block';
-            return;
-        }
-
-        el('searchBtn').disabled = true;
-        const prev = el('searchBtn').textContent;
-        el('searchBtn').innerHTML = '<span class="spinner"></span>';
-
-        setTimeout(() => {
-            el('searchBtn').disabled = false;
-            el('searchBtn').textContent = prev;
-
-            let st = loadState(nid);
-            const selCat = sessionStorage.getItem('ec_selected_category') || 'Kha';
-
-            if (!st) {
-                const current = JSON.parse(JSON.stringify(BASE_CURRENT));
-                current.nid = nid;
-                const requests = [];
-                const cat = selCat;
-                const status = 'Pending';
-                const newValues = {
-                    নাম: 'দেলোয়ার হোসেন',
-                    name: 'DELOWAR HOSSAIN',
-                    education: '৫ম শ্রেণী'
-                };
-                const oldValues = JSON.parse(JSON.stringify(current));
-
-                requests.push({
-                    id: uuid(),
-                    category: cat,
-                    status,
-                    oldValues,
-                    newValues,
-                    notes: 'সংশোধনের অনুরোধ',
-                    previousApplied: null
-                });
-
-                st = { current, requests };
-                saveState(nid, st);
-            }
-
-            sessionStorage.setItem('ec_last_nid', nid);
-            renderResults(nid, st);
-            el('resultsWrap').style.display = 'block';
-
-        }, 700);
-    }
-
-    function renderResults(nid, state) {
-        const tbody = el('resultsBody');
-        tbody.innerHTML = '';
-
-        state.requests.forEach((r, idx) => {
-            const tr = document.createElement('tr');
-            const nameDisplay = state.current.name || 'N/A';
-
-            let statusClass = 'status-pending';
-            if (r.status.includes('Approved')) statusClass = 'status-approved';
-            else if (r.status === 'Rejected') statusClass = 'status-rejected';
-
-            tr.innerHTML = `
-                <td><input type="checkbox"/></td>
-                <td class="muted">${r.id}</td>
-                <td>${nameDisplay}</td>
-                <td>${nid}</td>
-                <td><span class="status-chip ${statusClass}">${r.status}</span></td>
-                <td>${r.category}</td>
-                <td class="muted">ONLINE</td>
-                <td class="center"><span class="eye" data-idx="${idx}" title="View details">👁</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        document.querySelectorAll('.eye').forEach(e => {
-            e.onclick = () => {
-                const idx = parseInt(e.getAttribute('data-idx'));
-                const n = sessionStorage.getItem('ec_last_nid');
-                const s = loadState(n);
-                if (s) openDetailPage(n, idx, s);
+    <div id="detailPage" style="display:none">
+        <div class="detail-header">
+            <button class="back-btn" id="backToMain">← Back</button>
+            <div style="font-weight:700">Applied Change</div>
+        </div>
+        <div class="detail-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="font-size:16px;font-weight:700;color:#0b3a6e" id="detailTitle">Application Details</div>
+                <div class="muted" id="detailMeta">ID: - | Category: -</div>
+            </div>
+            <table class="detail-table">
+                <thead>
+                    <tr style="background:#f7fbff;color:#0b3a6e">
+                        <th style="width:48px;text-align:center"></th>
+                        <th>Field</th>
+                        <th>Old Value</th>
+                        <th>New Value</th>
+                    </tr>
+                </thead>
+                <tbody id="detailRows"></tbody>
+            </table>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+                <div id="detailNote" class="muted">Notes: none</div>
+                <div class="controls">
+                    <div id="detailLoader" style="display:none">
+                        <span class="spinner"></span><span style="margin-left:8px" class="muted">Processing...</span>
+                    </div>
+                    <button id="approveBtn" class="btn">Approve</button>
+                    <button id="cancelBtn" class="btn secondary">Reject</button>
+                    <button id="rollbackBtn" class="btn secondary" style="display:none">Rollback</button>
+                    <button id="downloadPdfBtn" class="btn secondary">Download PDF</button>
+                </div>
+            </div>
+            <div id="detailMsg" style="display:none;margin-top:12px"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const BASE_CURRENT = {
+                name: 'মোসাঃ ঝুমা আক্তার',  // আবেদনকারীর নাম চেঞ্জ করা হয়েছে
+                'পিতার নাম': 'মোঃ মিন্টু মিয়া',
+                'মাতার নাম': 'মোসাঃ রাবেয়া বেগম',
+                'বৈবাহিক অবস্থা': 'বিবাহিত',
+                'পেশা': 'গৃহিনী',
             };
-        });
-    }
-
-    function openDetailPage(nid, idx, state) {
-        el('appArea').style.display = 'none';
-        el('detailPage').style.display = 'block';
-
-        const req = state.requests[idx];
-        el('detailTitle').textContent = 'Application Details';
-        el('detailMeta').textContent = `ID: ${req.id} | Category: ${req.category}`;
-
-        const fields = [
-            { label: 'নাম (বাংলা)', key: 'নাম' },
-            { label: 'Name (ইংরেজি)', key: 'name' },
-            { label: 'শিক্ষাগত যোগ্যতা', key: 'education' },
-        ];
-
-        const tbody = el('detailRows');
-        tbody.innerHTML = '';
-
-        fields.forEach((f, i) => {
-            const oldV = req.oldValues[f.key] || '-';
-            const newV = req.newValues[f.key] || '-';
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="text-align:center"><input type="checkbox" ${i < 4 ? 'checked' : ''}></td>
-                <td>${f.label}</td>
-                <td>${oldV}</td>
-                <td>${newV}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        el('detailNote').textContent = req.notes ? `Notes: ${req.notes}` : 'Notes: none';
-
-        const approveBtn = el('approveBtn');
-        const cancelBtn  = el('cancelBtn');
-        const rollbackBtn = el('rollbackBtn');
-        const loader = el('detailLoader');
-        const msg = el('detailMsg');
-
-        msg.style.display = 'none';
-        loader.style.display = 'none';
-        approveBtn.disabled = false;
-        cancelBtn.disabled = false;
-
-        if (req.status.includes('Approved')) {
-            approveBtn.style.display = 'none';
-            cancelBtn.style.display = 'none';
-            rollbackBtn.style.display = 'inline-block';
-            msg.style.display = 'block';
-            msg.className = 'msg-success';
-            msg.textContent = 'এই জাতীয় পরিচয় পত্র সংশোধনটি শুধু মাত্র প্রধান নির্বাচন কমিশনার মহোদয়ের আইপি থেকে অনুমোদন দিতে পারবেন।';
-        } else if (req.status === 'Rejected') {
-            approveBtn.style.display = 'none';
-            cancelBtn.style.display = 'none';
-            rollbackBtn.style.display = 'inline-block';
-            msg.style.display = 'block';
-            msg.className = 'msg-info';
-            msg.textContent = 'এই আবেদন প্রত্যাখ্যাত হয়েছে।';
-        } else {
-            approveBtn.style.display = 'inline-block';
-            cancelBtn.style.display = 'inline-block';
-            rollbackBtn.style.display = 'none';
-        }
-
-        approveBtn.onclick = () => {
-            approveBtn.disabled = true;
-            cancelBtn.disabled = true;
-            loader.style.display = 'inline-block';
-
-            setTimeout(() => {
-                loader.style.display = 'none';
-
-                // Save previous for rollback
-                req.previousApplied = JSON.parse(JSON.stringify(state.current));
-
-                // Apply changes
-                state.current = { ...state.current, ...req.newValues };
-
-                state.requests[idx].status = 'Approved by ' + req.category;
-                saveState(nid, state);
-
-                msg.style.display = 'block';
-                msg.className = 'msg-success';
-                msg.textContent = 'অনুমোদন সফল হয়েছে।';
-
-                approveBtn.style.display = 'none';
-                cancelBtn.style.display = 'none';
-                rollbackBtn.style.display = 'inline-block';
-
-                renderResults(nid, state);
-
-                // Auto rollback after 10 seconds without mentioning time
+            const CATEGORY_LIST = ['Kha'];
+            sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Kha');
+            function storageKey(n) { return 'ec_nid_' + n }
+            function saveState(n, o) { localStorage.setItem(storageKey(n), JSON.stringify(o)); }
+            function loadState(n) { const v = localStorage.getItem(storageKey(n)); return v ? JSON.parse(v) : null; }
+            function el(id) { return document.getElementById(id) }
+            function uuid() { return 'APP' + Math.random().toString(36).slice(2, 9).toUpperCase(); }
+            const l = localStorage.getItem('ec_logo');
+            if (l && el('topLogo')) {
+                el('topLogo').src = l;
+                el('topLogo').style.display = 'block';
+            }
+            if (el('searchBtn')) el('searchBtn').onclick = doSearch;
+            if (el('nidInput')) el('nidInput').onkeydown = e => { if (e.key === 'Enter') doSearch() };
+            function doSearch() {
+                const nid = el('nidInput').value.trim();
+                const msg = el('searchMsg');
+                msg.style.display = 'none';
+                el('resultsWrap').style.display = 'none';
+                if (!nid || nid.length < 5) {
+                    msg.textContent = 'Please enter a valid NID.';
+                    msg.style.display = 'block';
+                    return;
+                }
+                el('searchBtn').disabled = true;
+                const prev = el('searchBtn').textContent;
+                el('searchBtn').innerHTML = '<span class="spinner"></span>';
                 setTimeout(() => {
-                    const latest = loadState(nid);
-                    if (!latest) return;
-                    const r2 = latest.requests[idx];
-                    if (!r2) return;
-
-                    if (r2.previousApplied) {
-                        latest.current = JSON.parse(JSON.stringify(r2.previousApplied));
-                        r2.previousApplied = null;
+                    el('searchBtn').disabled = false;
+                    el('searchBtn').textContent = prev;
+                    let st = loadState(nid);
+                    const selCat = sessionStorage.getItem('ec_selected_category') || 'Kha';
+                    if (!st) {
+                        const current = JSON.parse(JSON.stringify(BASE_CURRENT));
+                        current.nid = nid;
+                        const requests = [];
+                        const cat = selCat;
+                        const status = 'Pending';
+                        const newValues = {
+                            'পিতার নাম': 'মোঃ মনির হোসেন মিন্টু',
+                            'মাতার নাম': 'রাবেয়া বেগম',
+                            'বৈবাহিক অবস্থা': 'ডিভোর্স',
+                            'পেশা': 'চাকুরী',
+                        };
+                        const oldValues = JSON.parse(JSON.stringify(current));
+                        requests.push({ id: uuid(), category: cat, status, oldValues, newValues, notes: 'সংশোধনের অনুরোধ', previousApplied: null });
+                        st = { current, requests };
+                        saveState(nid, st);
                     }
-                    r2.status = 'Pending';
-                    saveState(nid, latest);
-
+                    sessionStorage.setItem('ec_last_nid', nid);
+                    renderResults(nid, st);
+                    el('resultsWrap').style.display = 'block';
+                }, 700);
+            }
+            function renderResults(nid, state) {
+                const tbody = el('resultsBody');
+                tbody.innerHTML = '';
+                state.requests.forEach((r, idx) => {
+                    const tr = document.createElement('tr');
+                    const nameDisplay = state.current.name || 'N/A';
+                    let statusClass = 'status-pending';
+                    if (r.status.includes('Approved')) statusClass = 'status-approved';
+                    else if (r.status === 'Rejected') statusClass = 'status-rejected';
+                    tr.innerHTML = `
+                        <td><input type="checkbox"/></td>
+                        <td class="muted">${r.id}</td>
+                        <td>${nameDisplay}</td>
+                        <td>${nid}</td>
+                        <td><span class="status-chip ${statusClass}">${r.status}</span></td>
+                        <td>${r.category}</td>
+                        <td class="muted">ONLINE</td>
+                        <td class="center"><span class="eye" data-idx="${idx}" title="View details">👁</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                document.querySelectorAll('.eye').forEach(e => {
+                    e.onclick = () => {
+                        const idx = parseInt(e.getAttribute('data-idx'));
+                        const n = sessionStorage.getItem('ec_last_nid');
+                        const s = loadState(n);
+                        if (s) openDetailPage(n, idx, s);
+                    };
+                });
+            }
+            function openDetailPage(nid, idx, state) {
+                el('appArea').style.display = 'none';
+                el('detailPage').style.display = 'block';
+                const req = state.requests[idx];
+                el('detailTitle').textContent = 'Application Details';
+                el('detailMeta').textContent = `ID: ${req.id} | Category: ${req.category}`;
+                const fields = [
+                    { label: 'পিতার নাম (বাংলা)', key: 'পিতার নাম' },
+                    { label: 'মাতার নাম (বাংলা)', key: 'মাতার নাম' },
+                    { label: 'বৈবাহিক অবস্থা', key: 'বৈবাহিক অবস্থা' },
+                    { label: 'পেশা', key: 'পেশা' },
+                ];
+                const tbody = el('detailRows');
+                tbody.innerHTML = '';
+                fields.forEach((f, i) => {
+                    const oldV = req.oldValues[f.key] || '-';
+                    const newV = req.newValues[f.key] || '-';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align:center"><input type="checkbox" ${i < 4 ? 'checked' : ''}></td>
+                        <td>${f.label}</td>
+                        <td>${oldV}</td>
+                        <td>${newV}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                el('detailNote').textContent = req.notes ? `Notes: ${req.notes}` : 'Notes: none';
+                const approveBtn = el('approveBtn');
+                const cancelBtn = el('cancelBtn');
+                const rollbackBtn = el('rollbackBtn');
+                const downloadPdfBtn = el('downloadPdfBtn');
+                const loader = el('detailLoader');
+                const msg = el('detailMsg');
+                msg.style.display = 'none';
+                loader.style.display = 'none';
+                approveBtn.disabled = false;
+                cancelBtn.disabled = false;
+                if (req.status.includes('Approved')) {
+                    approveBtn.style.display = 'none';
+                    cancelBtn.style.display = 'none';
+                    rollbackBtn.style.display = 'inline-block';
                     msg.style.display = 'block';
                     msg.className = 'msg-success';
-                    msg.textContent = 'এই জাতীয় পরিচয় পত্র সংশোধনটি শুধু মাত্র প্রধান নির্বাচন কমিশনার মহোদয়ের আইপি থেকে অনুমোদন দিতে পারবেন।';
-
+                    msg.textContent = 'এই জাতীয় পরিচয় পত্র সংশোধনটি অনুমোদিত হয়েছে।';
+                } else if (req.status === 'Rejected') {
+                    approveBtn.style.display = 'none';
+                    cancelBtn.style.display = 'none';
+                    rollbackBtn.style.display = 'inline-block';
+                    msg.style.display = 'block';
+                    msg.className = 'msg-info';
+                    msg.textContent = 'এই আবেদন প্রত্যাখ্যাত হয়েছে।';
+                } else {
                     approveBtn.style.display = 'inline-block';
                     cancelBtn.style.display = 'inline-block';
                     rollbackBtn.style.display = 'none';
-                    approveBtn.disabled = false;
-                    cancelBtn.disabled = false;
-
-                    renderResults(nid, latest);
-                }, 10000);
-
-            }, 1200);
-        };
-
-        cancelBtn.onclick = () => {
-            if (!confirm('আবেদনটি প্রত্যাখ্যান করতে চান?')) return;
-
-            approveBtn.disabled = true;
-            cancelBtn.disabled = true;
-            loader.style.display = 'inline-block';
-
-            setTimeout(() => {
-                loader.style.display = 'none';
-
-                state.requests[idx].status = 'Rejected';
-                state.requests[idx].previousApplied = null;
-                saveState(nid, state);
-
-                msg.style.display = 'block';
-                msg.className = 'msg-info';
-                msg.textContent = 'আবেদনটি প্রত্যাখ্যাত হয়েছে।';
-
-                approveBtn.style.display = 'none';
-                cancelBtn.style.display = 'none';
-                rollbackBtn.style.display = 'inline-block';
-
-                renderResults(nid, state);
-            }, 900);
-        };
-
-        rollbackBtn.onclick = () => {
-            loader.style.display = 'inline-block';
-
-            setTimeout(() => {
-                loader.style.display = 'none';
-
-                if (req.previousApplied) {
-                    state.current = JSON.parse(JSON.stringify(req.previousApplied));
-                    req.previousApplied = null;
                 }
-
-                state.requests[idx].status = 'Pending';
-                saveState(nid, state);
-
-                msg.style.display = 'block';
-                msg.className = 'msg-info';
-                msg.textContent = 'পূর্বের অবস্থায় ফিরিয়ে আনা হয়েছে।';
-
-                approveBtn.style.display = 'inline-block';
-                cancelBtn.style.display = 'inline-block';
-                rollbackBtn.style.display = 'none';
-
-                renderResults(nid, state);
-            }, 900);
-        };
-
-        el('backToMain').onclick = () => {
-            el('detailPage').style.display = 'none';
-            el('appArea').style.display = 'block';
-
-            const n = sessionStorage.getItem('ec_last_nid');
-            if (n) {
-                const s = loadState(n);
-                if (s) renderResults(n, s);
+                approveBtn.onclick = () => {
+                    approveBtn.disabled = true;
+                    cancelBtn.disabled = true;
+                    loader.style.display = 'inline-block';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        req.previousApplied = JSON.parse(JSON.stringify(state.current));
+                        state.current = { ...state.current, ...req.newValues };
+                        state.requests[idx].status = 'Approved by ' + req.category;
+                        saveState(nid, state);
+                        msg.style.display = 'block';
+                        msg.className = 'msg-success';
+                        msg.textContent = 'অনুমোদন সফল হয়েছে।';
+                        approveBtn.style.display = 'none';
+                        cancelBtn.style.display = 'none';
+                        rollbackBtn.style.display = 'inline-block';
+                        renderResults(nid, state);
+                    }, 1200);
+                };
+                cancelBtn.onclick = () => {
+                    if (!confirm('আবেদনটি প্রত্যাখ্যান করতে চান?')) return;
+                    approveBtn.disabled = true;
+                    cancelBtn.disabled = true;
+                    loader.style.display = 'inline-block';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        state.requests[idx].status = 'Rejected';
+                        state.requests[idx].previousApplied = null;
+                        saveState(nid, state);
+                        msg.style.display = 'block';
+                        msg.className = 'msg-info';
+                        msg.textContent = 'আবেদনটি প্রত্যাখ্যাত হয়েছে।';
+                        approveBtn.style.display = 'none';
+                        cancelBtn.style.display = 'none';
+                        rollbackBtn.style.display = 'inline-block';
+                        renderResults(nid, state);
+                    }, 900);
+                };
+                rollbackBtn.onclick = () => {
+                    loader.style.display = 'inline-block';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        if (req.previousApplied) {
+                            state.current = JSON.parse(JSON.stringify(req.previousApplied));
+                            req.previousApplied = null;
+                        }
+                        state.requests[idx].status = 'Pending';
+                        saveState(nid, state);
+                        msg.style.display = 'block';
+                        msg.className = 'msg-info';
+                        msg.textContent = 'পূর্বের অবস্থায় ফিরিয়ে আনা হয়েছে।';
+                        approveBtn.style.display = 'inline-block';
+                        cancelBtn.style.display = 'inline-block';
+                        rollbackBtn.style.display = 'none';
+                        renderResults(nid, state);
+                    }, 900);
+                };
+                downloadPdfBtn.onclick = () => {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    doc.setFont("helvetica");
+                    doc.setFontSize(12);
+                    doc.text("NID Correction Details", 10, 10);
+                    doc.text(`ID: ${req.id}`, 10, 20);
+                    doc.text(`Category: ${req.category}`, 10, 30);
+                    doc.text(`Notes: ${req.notes || 'none'}`, 10, 40);
+                    doc.autoTable({
+                        html: '#detailRows',
+                        startY: 50,
+                        head: [['', 'Field', 'Old Value', 'New Value']],
+                        theme: 'grid',
+                    });
+                    doc.save(`NID_${nid}_Correction.pdf`);
+                };
+                el('backToMain').onclick = () => {
+                    el('detailPage').style.display = 'none';
+                    el('appArea').style.display = 'block';
+                    const n = sessionStorage.getItem('ec_last_nid');
+                    if (n) {
+                        const s = loadState(n);
+                        if (s) renderResults(n, s);
+                    }
+                };
             }
-        };
-    }
-
-    const FIXED_OTP = "707390";
-
-    function togglePass() {
-        const p = el('userPass');
-        p.type = p.type === "password" ? "text" : "password";
-    }
-
-    el("loginBtn").onclick = function() {
-        const uid = el("userId").value.trim();
-        const pass = el("userPass").value.trim();
-
-        if (!uid || !pass) {
-            alert("ইউজার আইডি ও পাসওয়ার্ড দিন");
-            return;
-        }
-
-        this.textContent = "যাচাই হচ্ছে...";
-        this.classList.add("loading");
-
-        setTimeout(() => {
-            el("loginSection").style.display = "none";
-            el("otpSection").style.display = "block";
-            this.textContent = "লগইন করুন";
-            this.classList.remove("loading");
-        }, 1400);
-    };
-
-    el("verifyOtpBtn").onclick = function() {
-        const otp = el("otpInput").value.trim();
-
-        if (otp !== FIXED_OTP) {
-            alert("ভুল OTP কোড");
-            return;
-        }
-
-        el("authWrapper").style.display = "none";
-        el("mainHeader").style.display = "flex";
-        el("mainContainer").style.display = "block";
-        el("logoutBtn").style.display = "block";
-    };
-
-    function logout() {
-        location.reload();
-    }
-
-    el("logoutBtn").onclick = logout;
-</script>
+            const FIXED_OTP = "700007";
+            function togglePass() {
+                const p = el('userPass');
+                if (p) p.type = p.type === "password" ? "text" : "password";
+            }
+            const loginBtn = el("loginBtn");
+            if (loginBtn) {
+                loginBtn.onclick = function() {
+                    const uid = el("userId").value.trim();
+                    const pass = el("userPass").value.trim();
+                    if (!uid || !pass) {
+                        alert("ইউজার আইডি ও পাসওয়ার্ড দিন");
+                        return;
+                    }
+                    this.textContent = "যাচাই হচ্ছে...";
+                    this.classList.add("loading");
+                    setTimeout(() => {
+                        el("loginSection").style.display = "none";
+                        el("otpSection").style.display = "block";
+                        this.textContent = "লগইন করুন";
+                        this.classList.remove("loading");
+                    }, 1400);
+                };
+            }
+            const verifyOtpBtn = el("verifyOtpBtn");
+            if (verifyOtpBtn) {
+                verifyOtpBtn.onclick = function() {
+                    const otp = el("otpInput").value.trim();
+                    if (otp !== FIXED_OTP) {
+                        alert("ভুল OTP কোড");
+                        return;
+                    }
+                    el("authWrapper").style.display = "none";
+                    el("mainHeader").style.display = "flex";
+                    el("mainContainer").style.display = "block";
+                    el("logoutBtn").style.display = "block";
+                };
+            }
+            const logoutBtn = el("logoutBtn");
+            if (logoutBtn) {
+                logoutBtn.onclick = function() {
+                    location.reload();
+                };
+            }
+        });
+    </script>
 </body>
 </html>
