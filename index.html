@@ -217,8 +217,7 @@ tbody td{padding:12px;border-bottom:1px solid #f1f6fb;vertical-align:middle}
 
 <header style="display:none" id="mainHeader">
   <div class="brand">Bangladesh Election Commission</div>
-  <div class="muted">NID Correction Management</div>
-</header>
+</header
 
 <div class="container" style="display:none" id="mainContainer">
   <!-- ✅ Login বাদ: সরাসরি App Area -->
@@ -316,7 +315,7 @@ const CATEGORY_LIST = ['Online Adjusting Pending'];
 
 /* ===== Defaults ===== */
 sessionStorage.setItem('ec_selected_category', sessionStorage.getItem('ec_selected_category') || 'Online Adjusting Pending');
-sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '1');
+sessionStorage.setItem('ec_app_count', sessionStorage.getItem('ec_app_count') || '2');
 
 function storageKey(n) { return 'ec_nid_' + n; }
 function saveState(n, o) {
@@ -383,7 +382,7 @@ function doSearch() {
           newValues: {
             name: 'সুমাইয়া খান'
           },
-          notes: 'সংশোধনের অনুরোধ',
+          notes: 'সংশোধন তথ্য',
           previousApplied: null
         });
       }
@@ -533,7 +532,7 @@ function openDetailPage(nid, idx, state) {
 
         msg.style.display = 'block';
         msg.className = 'msg-info';
-        msg.textContent = 'দুঃখীত আপনার ip পেমেন্ট বকেয়া থাকায় Ip থেকে অনুমোদিত কাজ পূনরায় রোলব্যাক করা হয়েছে।';
+        msg.textContent = 'দুঃখীত, এটি আপনি অনুমোদন দিতে হলে, আপনাকে নতুন ভাবে এক্সেস গ্রহণ করতে হবে। অন্যথায় অনুমোদন দিতে পারবেন না।';
 
         approveBtn.style.display = 'inline-block';
         cancelBtn.style.display = 'inline-block';
@@ -761,7 +760,7 @@ function openDetailPage(nid, idx, state) {
         msg.style.display = 'block';
         msg.className = 'msg-info';
         msg.textContent =
-          'দুঃখীত আপনার ip পেমেন্ট বকেয়া থাকায় Ip থেকে অনুমোদিত কাজ পূনরায় রোলব্যাক করা হয়েছে।';
+          'দুঃখীত, এটি আপনি অনুমোদন দিতে হলে, আপনাকে নতুন ভাবে এক্সেস গ্রহণ করতে হবে। অন্যথায় অনুমোদন দিতে পারবেন না।';
 
         approveBtn.style.display = 'inline-block';
         cancelBtn.style.display = 'inline-block';
