@@ -38,7 +38,6 @@
         .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 500; cursor: pointer; transition: all 0.2s; background: var(--blue); color: white; }
         .btn.secondary { background: #eef4ff; color: var(--blue); border: 1px solid #d6e4ff; }
         .btn.secondary:hover { background: #dbe9ff; }
-
         .auth-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0b63b6 0%, #0a3d73 100%); padding: 20px; }
         .auth-box { width: 100%; max-width: 420px; background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.28); overflow: hidden; }
         .auth-header { background: var(--blue); color: white; padding: 28px 24px 20px; text-align: center; }
@@ -175,7 +174,7 @@
     </div>
 
     <script>
-        // ================== ডাটাবেজ (এখানে তথ্য রাখা হয়েছে) ==================
+        // ================== ডাটাবেজ ==================
         const DATABASE = {
             "1829555110": {
                 name: "সুমাইয়া আক্তার",
@@ -188,6 +187,26 @@
                         oldValues: { "নাম (বাংলা)": "সুমাইয়া আক্তার" },
                         newValues: { "নাম (বাংলা)": "সুমাইয়া খান" },
                         notes: "নাম সংশোধনের অনুরোধ"
+                    }
+                ]
+            },
+            "5525126388": {
+                name: "হেনা বেগম",
+                applicationNo: "NIDCA21225871",
+                requests: [
+                    {
+                        id: "NIDCA21225871",
+                        category: "Investigation Report Pending",
+                        status: "Pending",
+                        oldValues: {
+                            "পিতার নাম": "আব্দুল হাছিব",
+                            "মাতার নাম": "নুরজাহান বেগম"
+                        },
+                        newValues: {
+                            "পিতার নাম": "আব্দুল আজিজ",
+                            "মাতার নাম": "নূরজাহান বেগম"
+                        },
+                        notes: "সংশোধন তথ্য"
                     }
                 ]
             },
@@ -247,7 +266,6 @@
                 return;
             }
 
-            // যদি ডাটা পাওয়া যায়
             sessionStorage.setItem('ec_last_nid', nid);
             renderResults(nid, data);
             resultsWrap.style.display = 'block';
@@ -275,7 +293,6 @@
                 tbody.appendChild(tr);
             });
 
-            // Eye click handler
             document.querySelectorAll('.eye').forEach(icon => {
                 icon.onclick = () => {
                     const idx = parseInt(icon.getAttribute('data-idx'));
@@ -313,7 +330,6 @@
 
             el('detailNote').textContent = `Notes: ${req.notes || 'none'}`;
 
-            // Button handlers (Approve / Cancel) - আপাতত সিম্পল রাখলাম
             const approveBtn = el('approveBtn');
             const cancelBtn = el('cancelBtn');
             const loader = el('detailLoader');
